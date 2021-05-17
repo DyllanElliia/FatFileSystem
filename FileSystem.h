@@ -13,14 +13,14 @@ public:
     Input:  FILE_DESCRIPTOR
     Output: Boolen
     */
-	bool close(const F_D n);
+	bool close(const F_D fd);
 
 	/* used for File & Dir
     Input:  FILE_DESCRIPTOR
             Stat_ptr
     Output: Boolen
     */
-	bool fstat(const F_D n, const Stat* st);
+	bool fstat(const F_D fd, const Stat* st);
 
 	/* used for Dir
     Input:  DIR_NAME
@@ -63,8 +63,8 @@ public:
             Write_len
     Output: Write_Return
     */
-	W_RET write(const F_D, const string data, W_LEN len);
-	W_RET write(const F_D, const string data);
+	W_RET write(const F_D fd, const string data, W_LEN len);
+	W_RET write(const F_D fd, const string data);
 
 	/* used for File
     Input:  FILE_DESCRIPTOR
@@ -72,6 +72,6 @@ public:
             Read_len
     Output: Read_Return
     */
-	R_RET read(const F_D, const string& data, R_LEN len);
-	R_RET read(const F_D, const string& data);
+	R_RET read(const F_D fd, const string& data, R_LEN len);
+	R_RET read(const F_D fd, const string& data);
 };
