@@ -8,7 +8,7 @@
 -   cd
     -   dirName
 -   cat
-    -   FileName
+    -   fileName
 -   echo
     -   string
     -   (optional) >
