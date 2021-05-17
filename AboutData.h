@@ -17,10 +17,10 @@ struct FileData {
 };
 using FileData = struct FileData;
 
-#define F_DATA_LEN_LIMIT 40
+#define F_DATA_LEN_LIMIT 42
 struct FileDataData {
 	Stat st;
-	char data[41];
+	char data[42];
 	Offset brother;
 };
 using FileDataData = struct FileDataData;

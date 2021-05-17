@@ -6,3 +6,6 @@ using R_LEN = int;
 using W_RET = int;
 using R_RET = int;
 using string = std::string;
+
+class FileOptor {
+};
