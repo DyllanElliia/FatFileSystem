@@ -57,3 +57,14 @@
     -   W_RET write(F_D n, string data, W_LEN len);
     -   R_RET read(F_D n, string& data, R_LEN len);
 
+- [x] mkdir
+- [x] rmdir
+- [x] rm
+- [ ] ls
+- [ ] cd
+- [x] cat
+- [x] echo
+- [ ] find
+- [ ] tree
+- [ ] exit
+- [ ] pwd
