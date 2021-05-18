@@ -6,8 +6,6 @@
 #include "AboutData.h"
 // #include "function.cpp"
 
-#define BLOCK_SIZE 64
-
 class Block {
 public:
 	Block() {}
