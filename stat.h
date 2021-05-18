@@ -1,14 +1,14 @@
+#pragma once
 using Offset = int;
 using S_type = int;
 
-#define T_empty_block 0
-#define T_file 1
-#define T_dir 2
+#define T_file S_type(1)
+#define T_dir S_type(2)
+#define T_file_content S_type(3)
 
-struct stat {
-	S_type type;
+class Stat {
+public:
 	Offset dev;
+	S_type type;
 	int size;
 };
-
-using Stat = struct stat;

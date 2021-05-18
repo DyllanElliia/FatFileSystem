@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 
 using F_D = int;
@@ -8,4 +9,6 @@ using R_RET = int;
 using string = std::string;
 
 class FileOptor {
+private:
+public:
 };
