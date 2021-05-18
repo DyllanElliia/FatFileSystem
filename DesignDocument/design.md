@@ -45,11 +45,24 @@
 
 -   Dir:
     -   bool createDir(string DirName);
+    
     -   bool deleteDir(string DirName);
+    
     -   Path:
         -   bool openDir(string cdPath);
         -   string getDirName();
-    -   
+        
+    -   NameList getName();
+    
+        -   ```c++
+            NameList{
+            	data{
+            		S_type type;
+            		string name;
+            	}
+            	list<data> nameL;
+            }
+            ```
 -   FILE: 
     -   bool createFile(string DirName);
     -   bool deleteFile(string DirName);

@@ -1,3 +1,4 @@
+#pragma once
 #include "FileOptor.h"
 #include "stat.h"
 
@@ -63,8 +64,7 @@ Input:  FILE_DESCRIPTOR
       Write_len
 Output: Write_Return
 */
-  W_RET write(const F_D fd, const string data, W_LEN len);
-  W_RET write(const F_D fd, const string data);
+  W_RET write(const F_D fd, const string data, W_LEN len = -1);
 
   /* used for File
 Input:  FILE_DESCRIPTOR
@@ -72,6 +72,5 @@ Input:  FILE_DESCRIPTOR
       Read_len
 Output: Read_Return
 */
-  R_RET read(const F_D fd, const string& data, R_LEN len);
-  R_RET read(const F_D fd, const string& data);
+  R_RET read(const F_D fd, const string& data, R_LEN len = -1);
 };

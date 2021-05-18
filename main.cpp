@@ -1,9 +1,11 @@
 #include <iostream>
 
-#include "AboutData.h"
+// #include "function.h"
 
 int main(int argc, char const *argv[]) {
-	std::cout << sizeof(FileDataData) << std::endl;
-	std::cout << sizeof(int) << std::endl;
+	// char s[] = "asdfas\ndfasdf";
+	// char to[30];
+	// std::cout << charArrayCpy(s, to) << std::endl;
+	// std::cout << to << std::endl;
 	return 0;
 }

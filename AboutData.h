@@ -1,26 +1,29 @@
+#pragma once
 #include <string>
 
 #include "stat.h"
-struct DirData {
-	Stat st;
-	char name[32];
-	Offset NextDir = 0, NextFile = 0;
-	Offset father, brother;
-};
-using DirData = struct DirData;
 
-struct FileData {
+class DirData {
+public:
 	Stat st;
 	char name[32];
-	int size;
-	Offset father, brother;
+	Offset sonDir = 0, sonFile = 0;
+	Offset father = 0, brother = 0;
 };
-using FileData = struct FileData;
+// using DirData_ptr = DirData*;
+// using DirData_use = DirData&;
+
+class FileData {
+public:
+	Stat st;
+	char name[32];
+	Offset father = 0, brother = 0, message = 0;
+};
 
 #define F_DATA_LEN_LIMIT 42
-struct FileDataData {
+class FileDataData {
+public:
 	Stat st;
 	char data[42];
-	Offset brother;
+	Offset brother = 0;
 };
-using FileDataData = struct FileDataData;
