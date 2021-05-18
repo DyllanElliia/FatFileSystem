@@ -1,11 +1,17 @@
 #pragma once
+#include <list>
+
 #include "FileOptor.h"
 #include "stat.h"
 
 class FileSystem {
+private:
+	FileOptor file_opt;
+	Block* nowDir = nullptr;
+
 public:
 	/* used for File & Dir
-    Input:  Relative path
+    Input:  path
     Output: FILE_DESCRIPTOR
     */
 	F_D open(const string FilePathName);
@@ -45,6 +51,21 @@ public:
     Output: Boolen
     */
 	string getDirName();
+
+	struct nameList {
+		struct l_data {
+			S_type type;
+			string name;
+		};
+		using l_data = struct l_data;
+		std::list<l_data> nameL;
+	};
+	using nameList = struct nameList;
+	/* used for Dir
+    Input:  DIR_NAME
+    Output: Boolen
+    */
+	nameList getName();
 
 	/* used for File
     Input:  File_NAME
