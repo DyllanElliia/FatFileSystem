@@ -3,6 +3,15 @@
 #include <cstring>
 #include <iostream>
 
+std::list<string> User::split(string str, char s) {}
+
+string User::fmtName(string name) {
+  if (name[0] == '/') {
+    return name;
+  }
+  string current = fs.getDirName();
+}
+
 void User::mkdir(string dirName) {
   F_D fd = fs.open(dirName);
   if (fd != -1) {
@@ -52,7 +61,30 @@ void User::rm(string fileName) {
   }
 }
 
-void User::ls() {}
+void User::ls() {
+  NameList nl = fs.getName();
+  for (auto i : nl.nameL) {
+    F_D fd = fs.open(i->name);
+    if (fd < 0) {
+      std::cout << "ls: Cannot open file " << i->name << std::endl;
+      continue;
+    }
+    Stat stat;
+    if (!fs.fstat(fd, &stat)) {
+      std::cout << "ls: Cannot stat " << i->name << std::endl;
+      fs.close(fd);
+      continue;
+    }
+    fs.close(fd);
+    std::cout << i->name << " " << stat.type << " " << stat.size << std::endl;
+  }
+}
+
+void User::cd(string cdPath) {
+  if (!fs.openDir(cdPath)) {
+    std::cout << "cd: Cannot change dir " << cdPath << std::endl;
+  }
+}
 
 void User::cat(string fileName) {
   F_D fd = fs.open(fileName);
@@ -111,3 +143,44 @@ void User::echo(string data, string filePathName) {
   }
   fs.close(fd);
 }
+
+void User::find(string dirName, string fileName) {
+  string current = fs.getDirName();
+  cd(dirName);
+  NameList nl = fs.getName();
+  for (auto i : nl.nameL) {
+    if (i->name == fileName) {
+      string f = dirName + "/" + fileName;
+      std::cout << f << std::endl;
+    }
+    if (i->S_type == T_dir) {
+      string f = dirName + "/" + fileName;
+      find(f, fileName);
+    }
+  }
+  cd(current);
+}
+
+void User::tree(int level) {
+  string current = fs.getDirName();
+  NameList nl = fs.getName();
+  std::cout << "." << std::endl;
+  int num = nl.nameL.size();
+  for (auto i = nl.nameL.begin(); i != nl.nameL.end(); ++i) {
+    if (i != nl.nameL.end() - 1) {
+      std::cout << "├── " << i->name << std::endl;
+    } else {
+      std::cout << "└── " << i->name << std::endl;
+    }
+    if (i->S_type == T_dir && level != 1) {
+      cd(i->name);
+      tree(level - 1, 1);
+      cd(current);
+    }
+  }
+}
+void User::tree(int level, int currentLevel) { NameList }
+
+void User::exit() {}
+
+void User::pwd() {}

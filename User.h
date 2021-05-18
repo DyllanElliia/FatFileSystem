@@ -16,8 +16,8 @@ class User {
   // without input
   void ls();
 
-  // input dirName
-  void cd(string dirName);
+  // input cdPath
+  void cd(string cdPath);
 
   // input fileName
   void cat(string fileName);
@@ -33,13 +33,21 @@ class User {
   void find(string dirName, string fileName);
 
   // input tree level
-  void tree(int level = 1);
+  void tree(int level = -1);
+  // input tree level, current level
+  void tree(int level, int currentLevel);
 
   // without input
   void exit();
 
   // without input
   void pwd();
+
+  // input file/dir name
+  string fmtName(string name);
+
+  // input string, split char
+  std::list<string> split(string str, char s);
 
  private:
   FileSystem fs;

@@ -73,11 +73,13 @@
 - [x] mkdir
 - [x] rmdir
 - [x] rm
-- [ ] ls
-- [ ] cd
+- [x] ls
+- [x] cd
 - [x] cat
 - [x] echo
-- [ ] find
+- [x] find
 - [ ] tree
 - [ ] exit
 - [ ] pwd
+- [ ] fmtName
+- [ ] split
