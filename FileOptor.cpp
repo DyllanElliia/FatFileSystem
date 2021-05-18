@@ -4,7 +4,7 @@ FileOptor::FileOptor() {
 	f.open("./FAT_DATA", std::ios::in | std::ios::out | std::ios::binary);
 	if (!f.is_open()) {
 		std::cout << "ERROW! Failure to open file "
-				  << "./FAT_DATA" << std::endl;
+							<< "./FAT_DATA" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	if (f.eof()) {
@@ -107,7 +107,7 @@ bool FileOptor::cleanFatBlock(Offset FAT1_o) {
 	Offset Fat1_of = FAT1_o;
 	Offset Fat2_of = Fat1_of + FAT1_SIZE;
 	if (cleanBlock(Fat1_of) &&
-		cleanBlock(Fat2_of))
+			cleanBlock(Fat2_of))
 		return true;
 	else
 		return false;
