@@ -52,12 +52,6 @@ Output: Boolen
 */
   string getDirName();
 
-  /* used for File
-Input:  File_NAME
-Output: Boolen
-*/
-  bool createFile(const string DirName);
-=======
   struct nameList {
     struct l_data {
       S_type type;
