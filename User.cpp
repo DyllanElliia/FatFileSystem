@@ -3,13 +3,10 @@
 #include <cstring>
 #include <iostream>
 
-std::list<string> User::split(string str, char s) {}
-
 string User::fmtName(string name) {
   if (name[0] == '/') {
     return name;
   }
-  string current = fs.getDirName();
 }
 
 void User::mkdir(string dirName) {
