@@ -78,8 +78,8 @@
 - [x] cat
 - [x] echo
 - [x] find
-- [ ] tree
-- [ ] exit
-- [ ] pwd
-- [ ] fmtName
-- [ ] split
+- [x] tree
+- [x] exit
+- [x] pwd
+- [x] fmtName
+- [x] split

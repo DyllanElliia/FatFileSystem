@@ -2,13 +2,43 @@
 
 #include <cstring>
 #include <iostream>
+#include <regex>
 
 string User::fmtName(string name) {
+  string fmtName;
   if (name[0] == '/') {
-    return name;
+    std::list<string> ls = User::split(name);
+    std::list<string> st;
+    for (auto&& i : ls) {
+      if (i != ".." && i != ".") {
+        st.push_back(i);
+      } else if (i == ".." && !st.empty()) {
+        st.pop_back();
+      }
+    }
+    for (auto&& i : st) {
+      fmtName.push_back('/');
+      fmtName += i;
+    }
+    return fmtName;
+  } else {
+    string n = fs.getDirName();
+    n.push_back('/');
+    n += name;
+    fmtName = User::fmtName(n);
+    return fmtName;
   }
 }
-std::list<string> User::split(string str, char s) {}
+
+std::list<string> User::split(string str) {
+  std::regex ws_re("/");
+  std::list<string> v(
+      std::sregex_token_iterator(str.begin(), str.end(), ws_re, -1),
+      std::sregex_token_iterator());
+
+  v.pop_front();
+  return v;
+}
 
 void User::mkdir(string dirName) {
   F_D fd = fs.open(dirName);
@@ -151,7 +181,7 @@ void User::find(string dirName, string fileName) {
       string f = dirName + "/" + fileName;
       std::cout << f << std::endl;
     }
-    if (i->S_type == T_dir) {
+    if (i.type == T_dir) {
       string f = dirName + "/" + fileName;
       find(f, fileName);
     }
@@ -165,20 +195,41 @@ void User::tree(int level) {
   std::cout << "." << std::endl;
   int num = nl.nameL.size();
   for (auto i = nl.nameL.begin(); i != nl.nameL.end(); ++i) {
-    if (i != nl.nameL.end() - 1) {
-      std::cout << "├── " << i.name << std::endl;
+    if (i != --nl.nameL.end()) {
+      std::cout << "├── " << i->name << std::endl;
     } else {
-      std::cout << "└── " << i.name << std::endl;
+      std::cout << "└── " << i->name << std::endl;
     }
-    if (i->S_type == T_dir && level != 1) {
-      cd(i.name);
+    if (i->type == T_dir && level != 1) {
+      cd(i->name);
       tree(level - 1, 1);
       cd(current);
     }
   }
 }
-void User::tree(int level, int currentLevel) { nameList }
+void User::tree(int level, int currentLevel) {
+  string current = fs.getDirName();
+  nameList nl = fs.getName();
+  for (auto i = nl.nameL.begin(); i != nl.nameL.end(); ++i) {
+    for (int i = 0; i < currentLevel; ++i) {
+      std::cout << "│  ";
+    }
+    if (i != --nl.nameL.end()) {
+      std::cout << "├── " << i->name << std::endl;
+    } else {
+      std::cout << "└── " << i->name << std::endl;
+    }
+    if (i->type == T_dir && level != 1) {
+      cd(i->name);
+      tree(level - 1, currentLevel + 1);
+      cd(current);
+    }
+  }
+}
 
-void User::exit() {}
+void User::exit() { std::exit(EXIT_SUCCESS); }
 
-void User::pwd() {}
+void User::pwd() {
+  string pwd = fs.getDirName();
+  fs.write(1, pwd);
+}

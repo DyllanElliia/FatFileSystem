@@ -47,7 +47,7 @@ class User {
   string fmtName(string name);
 
   // input string, split char
-  std::list<string> split(string str, char s);
+  std::list<string> split(string str);
 
  private:
   FileSystem fs;
