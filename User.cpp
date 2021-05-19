@@ -8,6 +8,7 @@ string User::fmtName(string name) {
     return name;
   }
 }
+std::list<string> User::split(string str, char s) {}
 
 void User::mkdir(string dirName) {
   F_D fd = fs.open(dirName);
@@ -59,21 +60,21 @@ void User::rm(string fileName) {
 }
 
 void User::ls() {
-  NameList nl = fs.getName();
+  FileSystem::nameList nl = fs.getName();
   for (auto i : nl.nameL) {
-    F_D fd = fs.open(i->name);
+    F_D fd = fs.open(i.name);
     if (fd < 0) {
-      std::cout << "ls: Cannot open file " << i->name << std::endl;
+      std::cout << "ls: Cannot open file " << i.name << std::endl;
       continue;
     }
     Stat stat;
     if (!fs.fstat(fd, &stat)) {
-      std::cout << "ls: Cannot stat " << i->name << std::endl;
+      std::cout << "ls: Cannot stat " << i.name << std::endl;
       fs.close(fd);
       continue;
     }
     fs.close(fd);
-    std::cout << i->name << " " << stat.type << " " << stat.size << std::endl;
+    std::cout << i.name << " " << stat.type << " " << stat.size << std::endl;
   }
 }
 
@@ -144,9 +145,9 @@ void User::echo(string data, string filePathName) {
 void User::find(string dirName, string fileName) {
   string current = fs.getDirName();
   cd(dirName);
-  NameList nl = fs.getName();
+  nameList nl = fs.getName();
   for (auto i : nl.nameL) {
-    if (i->name == fileName) {
+    if (i.name == fileName) {
       string f = dirName + "/" + fileName;
       std::cout << f << std::endl;
     }
@@ -160,23 +161,23 @@ void User::find(string dirName, string fileName) {
 
 void User::tree(int level) {
   string current = fs.getDirName();
-  NameList nl = fs.getName();
+  nameList nl = fs.getName();
   std::cout << "." << std::endl;
   int num = nl.nameL.size();
   for (auto i = nl.nameL.begin(); i != nl.nameL.end(); ++i) {
     if (i != nl.nameL.end() - 1) {
-      std::cout << "├── " << i->name << std::endl;
+      std::cout << "├── " << i.name << std::endl;
     } else {
-      std::cout << "└── " << i->name << std::endl;
+      std::cout << "└── " << i.name << std::endl;
     }
     if (i->S_type == T_dir && level != 1) {
-      cd(i->name);
+      cd(i.name);
       tree(level - 1, 1);
       cd(current);
     }
   }
 }
-void User::tree(int level, int currentLevel) { NameList }
+void User::tree(int level, int currentLevel) { nameList }
 
 void User::exit() {}
 
