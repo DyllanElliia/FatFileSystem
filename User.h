@@ -1,8 +1,11 @@
+#include <map>
+
 #include "./FileSystem.h"
 
 class User {
  public:
   User() = default;
+  ~User();
 
   // input dirName
   void mkdir(string dirName);
@@ -34,8 +37,6 @@ class User {
 
   // input tree level
   void tree(int level = -1);
-  // input tree level, current level
-  void tree(int level, int currentLevel);
 
   // without input
   void exit();
@@ -51,4 +52,10 @@ class User {
 
  private:
   FileSystem fs;
+  // input tree level, current level
+  void tree(int level, int currentLevel);
 };
+typedef void (User::*func_ptr_0)();
+typedef void (User::*func_ptr_str)(string);
+typedef void (User::*func_ptr_str_str)(string, string);
+typedef void (User::*func_ptr_int)(int);
