@@ -12,7 +12,7 @@ bool Dir::changeSonDirHead(Offset o) {
 	data.sonDir = o;
 	return true;
 }
-Offset Dir::getSonDirHead(Offset o) {
+Offset Dir::getSonDirHead() {
 	return data.sonDir;
 }
 // Son of File
@@ -20,7 +20,7 @@ bool Dir::changeSonFileHead(Offset o) {
 	data.sonFile = o;
 	return true;
 }
-Offset Dir::getSonFileHead(Offset o) {
+Offset Dir::getSonFileHead() {
 	return data.sonFile;
 }
 // Data Transform
@@ -56,10 +56,19 @@ bool Dir::setStat(Stat st) {
 	data.st = st;
 	return true;
 }
+char* Dir::getDataCharPtr() {
+	return (char*)&data;
+}
+
 // for File AND Dir
 Offset Dir::getFatherOff() {
 	return data.father;
 }
+bool Dir::changeFatherOff(Offset o) {
+	data.father = o;
+	return true;
+}
+
 std::string Dir::getName() {
 	return std::string(data.name);
 }
