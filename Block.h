@@ -12,10 +12,10 @@ public:
 	~Block() {}
 	// Son of Dir
 	virtual bool changeSonDirHead(Offset o) = 0;
-	virtual Offset getSonDirHead(Offset o) = 0;
+	virtual Offset getSonDirHead() = 0;
 	// Son of File
 	virtual bool changeSonFileHead(Offset o) = 0;
-	virtual Offset getSonFileHead(Offset o) = 0;
+	virtual Offset getSonFileHead() = 0;
 	// Data Transform
 	virtual bool Data2Block(void* data_ptr) = 0;
 	virtual void* Block2Data() = 0;
@@ -26,8 +26,10 @@ public:
 	virtual Offset getBrotherOff() = 0;
 	virtual Stat getStat() = 0;
 	virtual bool setStat(Stat st) = 0;
+	virtual char* getDataCharPtr() = 0;
 	// for File AND Dir
 	virtual Offset getFatherOff() = 0;
+	virtual bool changeFatherOff(Offset o) = 0;
 	virtual bool setName(std::string name) = 0;
 	virtual std::string getName() = 0;
 	// for File

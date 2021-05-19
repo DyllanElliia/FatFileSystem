@@ -2,18 +2,22 @@
 #include <list>
 
 #include "FileOptor.h"
-#include "stat.h"
 
 class FileSystem {
- private:
-  FileOptor file_opt;
-  Block* nowDir = nullptr;
+private:
+	FileOptor file_opt;
+	Block* nowDir = nullptr;
+	Offset findLongPath(Offset off_begin, std::list<string>& pathList);
+	Offset findDirSonDir(Offset off_begin, string name);
 
- public:
-  // used for File & Dir
-  // Input:     path
-  // Output:    FILE_DESCRIPTOR
-  F_D open(const string FilePathName);
+public:
+	FileSystem();
+	~FileSystem();
+	bool PathSpliter(string path, const char split, std::list<string>& result);
+	// used for File & Dir
+	// Input:     path
+	// Output:    FILE_DESCRIPTOR
+	F_D open(const string FilePathName);
 
   // used for File & Dir
   // Input:     FILE_DESCRIPTOR
