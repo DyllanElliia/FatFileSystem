@@ -8,7 +8,7 @@ using S_type = int;
 
 class Stat {
 public:
-	Offset dev;
-	S_type type;
-	int size;
+	Offset dev = 0;
+	S_type type = 0;
+	int size = 0;
 };
