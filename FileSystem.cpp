@@ -3,11 +3,7 @@
 #include <sstream>
 
 FileSystem::FileSystem() {}
-FileSystem::~FileSystem() {
-	if (nowDir) {
-		delete nowDir;
-	}
-}
+FileSystem::~FileSystem() {}
 
 bool FileSystem::PathSpliter(string path, const char split, std::list<string>& result) {
 	std::istringstream iss(path);		// 输入流
@@ -210,21 +206,217 @@ bool FileSystem::createDir(const string DirName) {
 // used for Dir
 // Input:     DIR_NAME
 // Output:    Boolen
-bool FileSystem::deleteDir(const string DirName) {}
+bool FileSystem::deleteDir(const string DirName) {
+	std::list<string> pathList;
+	PathSpliter(DirName, '/', pathList);
+	Block* pathB = nullptr;
+	if (pathList.size() == 0) {
+		std::cout << "path is empty!" << std::endl;
+		return false;
+	}
+	if (pathList.size() == 1) {
+		// create Dir in Fat1 AND Fat2
+		Offset fat_offset = file_opt.findFat1Block(T_dir, pathList.front());
+		if (!file_opt.getLastFindBool()) {
+			std::cout << pathList.front() << " not found!" << std::endl;
+			return false;
+		}
+		// delete
+		Offset save = nowDir_off;
+		nowDir_off = fat_offset;
+		nameList nList = getName();
+		nowDir_off = save;
+		for (auto obj : nList.nameL) {
+			string newPath = DirName + "/" + obj.name;
+			switch (obj.type) {
+			case T_dir:
+				deleteDir(newPath);
+				break;
+			case T_file:
+				deleteFile(newPath);
+				break;
+			default:
+				std::cout << "error not path " << newPath << std::endl;
+			}
+		}
+
+		file_opt.cleanFatBlock(fat_offset);
+		return true;
+	}
+	// long path
+	// FAT1
+	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
+	if (!file_opt.getLastFindBool()) {
+		std::cout << pathList.front() << " not found" << std::endl;
+		return false;
+	}
+	pathList.pop_front();
+	string back_name = pathList.back();
+	pathList.pop_back();
+	Offset dir_off = findLongPath(Fat1_offset, pathList);
+	// std::cout << "dir: " << dir_off << std::endl;
+	if (dir_off >= HEAD_SIZE) {
+		Offset DirHere = findDirSonDir(dir_off, back_name);
+		if (DirHere >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+			Offset save = nowDir_off;
+			nowDir_off = DirHere;
+			nameList nList = getName();
+			nowDir_off = save;
+			for (auto obj : nList.nameL) {
+				string newPath = DirName + "/" + obj.name;
+				switch (obj.type) {
+				case T_dir:
+					deleteDir(newPath);
+					break;
+				case T_file:
+					deleteFile(newPath);
+					break;
+				default:
+					std::cout << "error not path " << newPath << std::endl;
+				}
+			}
+			// chang link
+			// if father link you?
+			Dir fatherDir;
+			file_opt.move2offset_short(dir_off);
+			file_opt.readData(fatherDir.getDataCharPtr(), fatherDir.getDataSize());
+			Dir nowDir;
+			file_opt.move2offset_short(DirHere);
+			file_opt.readData(nowDir.getDataCharPtr(), nowDir.getDataSize());
+			if (fatherDir.getSonDirHead() == DirHere) {
+				fatherDir.changeSonDirHead(nowDir.getBrotherOff());
+				file_opt.move2offset_short(dir_off);
+				file_opt.saveData(fatherDir.getDataCharPtr(), fatherDir.getDataSize());
+			} else {
+				Offset lastDir_offset = fatherDir.getSonDirHead();
+				while (true) {
+					Dir dir_data;
+					file_opt.move2offset_short(lastDir_offset);
+					file_opt.readData(dir_data.getDataCharPtr(), dir_data.getDataSize());
+					if (dir_data.getBrotherOff() == DirHere) {
+						dir_data.changeBrother(nowDir.getBrotherOff());
+						file_opt.move2offset_short(lastDir_offset);
+						file_opt.saveData(dir_data.getDataCharPtr(), dir_data.getDataSize());
+						break;
+					}
+					lastDir_offset = dir_data.getBrotherOff();
+				}
+			}
+			file_opt.cleanBlock(DirHere);
+			return true;
+		}
+		std::cout << "failed to find " << back_name << std::endl;
+		return false;
+	}
+	std::cout << DirName << ": delete dir failed." << std::endl;
+	return false;
+}
 
 // used for Dir_path
 // Input:     path
 // Output:    Boolen
-bool FileSystem::openDir(const string cdPath) {}
+bool FileSystem::openDir(const string cdPath) {
+	std::list<string> pathList;
+	PathSpliter(cdPath, '/', pathList);
+	if (pathList.size() == 0) {
+		nowDir_off = 0;
+		return false;
+	}
+	if (pathList.size() == 1) {
+		Offset fat_off = file_opt.findFat1Block(T_dir, pathList.front());
+		if (!file_opt.getLastFindBool()) {
+			std::cout << "failed to find " << cdPath << std::endl;
+			return false;
+		}
+		nowDir_off = fat_off;
+		return true;
+	}
+	// long path
+	// FAT1
+	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
+	if (!file_opt.getLastFindBool()) {
+		std::cout << pathList.front() << " not found" << std::endl;
+		return false;
+	}
+	pathList.pop_front();
+	Offset dir_off = findLongPath(Fat1_offset, pathList);
+	if (dir_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+		std::cout << "failed to find " << cdPath << std::endl;
+		return false;
+	}
+	nowDir_off = dir_off;
+	return true;
+}
 
 // used for Dir_path
 // Output:    Boolen
-string FileSystem::getDirName() {}
+string FileSystem::getDirName() {
+	string path = "";
+	Offset now_off = nowDir_off;
+	if (now_off == 0) {
+		return path + "/";
+	}
+	Dir nowDir;
+	while (true) {
+		file_opt.move2offset_short(now_off);
+		file_opt.readData(nowDir.getDataCharPtr(), nowDir.getDataSize());
+		path = "/" + nowDir.getName() + path;
+		if (nowDir.getFatherOff() == now_off) {
+			break;
+		}
+		now_off = nowDir.getFatherOff();
+	}
+	return path;
+}
 
 // used for Dir
 // Input:     DIR_NAME
 // Output:    Boolen
-nameList FileSystem::getName() {}
+nameList FileSystem::getName() {
+	nameList nList;
+	// for FAT again. i hate fat. i think i shoule design a better fat file struct at next time.
+	if (nowDir_off == 0) {
+		Offset fat_off = HEAD_SIZE;
+		for (int i = 0; i < FAT_BLOCK_NUM; ++i) {
+			file_opt.move2offset_short(fat_off + i * BLOCK_SIZE);
+			char blockData[BLOCK_SIZE];
+			file_opt.readData(blockData, BLOCK_SIZE);
+			// std::cout << string(((DirData*)blockData)->name) << std::endl;
+			switch (((DirData*)blockData)->st.type) {
+			case T_dir:
+				nList.nameL.push_back({T_dir, string(((DirData*)blockData)->name)});
+				break;
+			case T_file:
+				nList.nameL.push_back({T_file, string(((DirData*)blockData)->name)});
+				break;
+			}
+		}
+		return nList;
+	}
+
+	Dir nowDir;
+	file_opt.move2offset_short(nowDir_off);
+	file_opt.readData(nowDir.getDataCharPtr(), nowDir.getDataSize());
+	Offset sonDir_off = nowDir.getSonDirHead();
+	Offset sonFile_off = nowDir.getSonFileHead();
+
+	while (sonDir_off) {
+		Dir sonDir;
+		file_opt.move2offset_short(sonDir_off);
+		file_opt.readData(sonDir.getDataCharPtr(), sonDir.getDataSize());
+		nList.nameL.push_back({T_dir, sonDir.getName()});
+		sonDir_off = sonDir.getBrotherOff();
+	}
+
+	while (sonFile_off) {
+		File sonFile;
+		file_opt.move2offset_short(sonFile_off);
+		file_opt.readData(sonFile.getDataCharPtr(), sonFile.getDataSize());
+		nList.nameL.push_back({T_file, sonFile.getName()});
+		sonFile_off = sonFile.getBrotherOff();
+	}
+	return nList;
+}
 
 // used for File
 // Input:     File_NAME

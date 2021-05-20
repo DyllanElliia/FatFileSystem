@@ -202,8 +202,8 @@ Offset FileOptor::findFat1Block(S_type type, string name) {
 bool FileOptor::cleanBlock(Offset o) {
 	Offset blockOffset = o;
 	move2offset_short(blockOffset);
-	char blockData[BLOCK_SIZE];
-	f.write(blockData, BLOCK_SIZE);
+	DirData blockData;
+	f.write((char*)&blockData, sizeof(DirData));
 	move2offset_short(f_offset);
 	return true;
 }

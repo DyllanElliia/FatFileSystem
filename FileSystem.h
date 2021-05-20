@@ -6,7 +6,8 @@
 class FileSystem {
 private:
 	FileOptor file_opt;
-	Block* nowDir = nullptr;
+	Offset nowDir_off = 0;
+
 	Offset findLongPath(Offset off_begin, std::list<string>& pathList);
 	Offset findDirSonDir(Offset off_begin, string name);
 
