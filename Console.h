@@ -1,10 +1,10 @@
-
-#include "User.h"
+#pragma once
+#include "./User.h"
 
 class Console {
  public:
   Console();
-  ~Console();
+  // ~Console();
   User user;
   FileSystem fs;
   void run();

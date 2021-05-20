@@ -1,4 +1,4 @@
-#include "Console.h"
+#include "./Console.h"
 
 #include <cstring>
 #include <ostream>
@@ -19,6 +19,7 @@ Console::Console() {
   f2["echo"] = &User::echo;
   f2["find"] = &User::find;
 }
+
 
 void Console::run() {
   auto console = new Console();

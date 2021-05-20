@@ -1,3 +1,4 @@
+#pragma once
 #include <map>
 
 #include "./FileSystem.h"
@@ -5,7 +6,7 @@
 class User {
  public:
   User() = default;
-  ~User();
+  ~User(){};
 
   // input dirName
   void mkdir(string dirName);
