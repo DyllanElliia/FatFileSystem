@@ -1,15 +1,19 @@
 #pragma once
 #include <list>
 
+#include "F_D_saver.h"
 #include "FileOptor.h"
 
 class FileSystem {
 private:
 	FileOptor file_opt;
 	Offset nowDir_off = 0;
+	F_D_saver fdBuf;
 
 	Offset findLongPath(Offset off_begin, std::list<string>& pathList);
 	Offset findDirSonDir(Offset off_begin, string name);
+	Offset findDirSonFile(Offset off_begin, string name);
+	bool cleanFileData(Offset FileData_Begin);
 
 public:
 	FileSystem();

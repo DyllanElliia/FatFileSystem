@@ -53,6 +53,42 @@ Offset FileSystem::findDirSonDir(Offset off_begin, string name) {
 		}
 		dir_off = blockData.getBrotherOff();
 	}
+	return 0;
+}
+
+Offset FileSystem::findDirSonFile(Offset off_begin, string name) {
+	Offset dir_off;
+	file_opt.move2offset_short(off_begin);
+	Dir lastDir;
+	if (!file_opt.readData(lastDir.getDataCharPtr(), lastDir.getDataSize())) {
+		std::cout << "read data failed. Path: " << name << std::endl;
+		return 0;
+	}
+	Offset dir_begin = lastDir.getSonFileHead();
+	if (dir_begin == 0)
+		return 0;
+	if (dir_begin < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+		std::cout << "error path. " << name << " can not be found." << std::endl;
+		return 0;
+	}
+	dir_off = dir_begin;
+	while (dir_off >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+		file_opt.move2offset_short(dir_off);
+		File blockData;
+		if (!file_opt.readData(blockData.getDataCharPtr(), blockData.getDataSize())) {
+			std::cout << "read data failed. Path: " << name << std::endl;
+			return 0;
+		}
+		if (blockData.getStat().dev != dir_off) {
+			std::cout << "Block data errow! path: " << name << std::endl;
+			return 0;
+		}
+		if (name.compare(blockData.getName()) == 0) {
+			return dir_off;
+		}
+		dir_off = blockData.getBrotherOff();
+	}
+	return 0;
 }
 
 Offset FileSystem::findLongPath(Offset off_begin, std::list<string>& pathList) {
@@ -101,18 +137,91 @@ Offset FileSystem::findLongPath(Offset off_begin, std::list<string>& pathList) {
 // used for File & Dir
 // Input:     path
 // Output:    FILE_DESCRIPTOR
-F_D FileSystem::open(const string FilePathName) {}
+F_D FileSystem::open(const string FilePathName) {
+	std::list<string> pathList;
+	PathSpliter(FilePathName, '/', pathList);
+	Block* pathB = nullptr;
+	if (pathList.size() == 0) {
+		std::cout << "path is empty!" << std::endl;
+		return -1;
+	}
+	if (pathList.size() == 1) {
+		// create File in Fat1 AND Fat2
+		Offset fat_offset = file_opt.findFat1Block(T_file, pathList.front());
+		if (!file_opt.getLastFindBool()) {
+			std::cout << pathList.front() << " not found!" << std::endl;
+			return -1;
+		}
+		F_D fd = fdBuf.get();
+		if (fdBuf.set(fd, fat_offset))
+			return fd;
+		else {
+			std::cout << FilePathName << " has been opened!" << std::endl;
+			return -1;
+		}
+	}
+	// long path
+	// FAT1
+	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
+	if (!file_opt.getLastFindBool()) {
+		std::cout << pathList.front() << " not found" << std::endl;
+		return -1;
+	}
+	pathList.pop_front();
+	string back_name = pathList.back();
+	pathList.pop_back();
+	Offset dir_off = findLongPath(Fat1_offset, pathList);
+	// std::cout << "dir: " << dir_off << std::endl;
+	if (dir_off >= HEAD_SIZE) {
+		Offset file_off = findDirSonFile(dir_off, back_name);
+		if (file_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+			std::cout << FilePathName << " already exists!" << std::endl;
+			return -1;
+		}
+		F_D fd = fdBuf.get();
+		if (fd && fdBuf.set(fd, file_off))
+			return fd;
+		else {
+			std::cout << FilePathName << " has been opened!" << std::endl;
+			return -1;
+		}
+	}
+	std::cout << FilePathName << ": open file failed." << std::endl;
+	return -1;
+}
 
 // used for File & Dir
 // Input:     FILE_DESCRIPTOR
 // Output:    Boolen
-bool FileSystem::close(const F_D fd) {}
+bool FileSystem::close(const F_D fd) {
+	if (fd == -1)
+		return false;
+	return fdBuf.remove(fd);
+}
 
 // used for File & Dir
 // Input:     FILE_DESCRIPTOR
 //            Stat_ptr
 // Output:    Boolen
-bool FileSystem::fstat(const F_D fd, const Stat* st) {}
+bool FileSystem::fstat(const F_D fd, const Stat* st) {
+	if (fd == -1)
+		return false;
+	Offset off = fdBuf.getOff(fd);
+	if (off >= HEAD_SIZE) {
+		if (!st) {
+			std::cout << "stat_ptr must be new a space!" << std::endl;
+			return false;
+		}
+		file_opt.move2offset_short(off);
+		file_opt.readData((char*)st, sizeof(Stat));
+		if (st->dev != off) {
+			std::cout << "error, the F_D you input is damaged!" << std::endl;
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
 
 // used for Dir
 // Input:     DIR_NAME
@@ -421,12 +530,194 @@ nameList FileSystem::getName() {
 // used for File
 // Input:     File_NAME
 // Output:    Boolen
-bool FileSystem::createFile(const string DirName) {}
+bool FileSystem::createFile(const string DirName) {
+	std::list<string> pathList;
+	PathSpliter(DirName, '/', pathList);
+	Block* pathB = nullptr;
+	if (pathList.size() == 0) {
+		std::cout << "path is empty!" << std::endl;
+		return false;
+	}
+	if (pathList.size() == 1) {
+		// create File in Fat1 AND Fat2
+		Offset fat_offset = file_opt.findFat1Block(T_file, pathList.front());
+		if (file_opt.getLastFindBool()) {
+			std::cout << pathList.front() << " already exists!" << std::endl;
+			return false;
+		}
+		fat_offset = file_opt.findEmptyFatBlock();
+		if (!file_opt.getLastFindBool()) {
+			std::cout << "failed to find empty fat block!" << std::endl;
+			return false;
+		}
+		Stat st;
+		st.type = T_file;
+		st.dev = fat_offset;
+		st.size = 0;
+		File fat;
+		fat.setStat(st);
+		fat.changeFatherOff(fat_offset);
+		fat.setName(pathList.front());
+		// std::cout << fat.getStat().dev << " of: " << fat_offset << std::endl;
+		file_opt.move2offset_short(fat_offset);
+		file_opt.saveData(fat.getDataCharPtr(), fat.getDataSize());
+
+		fat_offset += FAT1_SIZE;
+		st.dev = fat_offset;
+		fat.setStat(st);
+		fat.changeFatherOff(fat_offset);
+		fat.setName(pathList.front());
+		file_opt.move2offset_short(fat_offset);
+		file_opt.saveData(fat.getDataCharPtr(), fat.getDataSize());
+		return true;
+	}
+	// long path
+	// FAT1
+	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
+	if (!file_opt.getLastFindBool()) {
+		std::cout << pathList.front() << " not found" << std::endl;
+		return false;
+	}
+	pathList.pop_front();
+	string back_name = pathList.back();
+	pathList.pop_back();
+	Offset dir_off = findLongPath(Fat1_offset, pathList);
+	// std::cout << "dir: " << dir_off << std::endl;
+	if (dir_off >= HEAD_SIZE) {
+		if (findDirSonFile(dir_off, back_name) >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+			std::cout << DirName << " already exists!" << std::endl;
+			return false;
+		}
+		Offset newOff = file_opt.findEmptyBlock();
+		if (!file_opt.getLastFindBool()) {
+			std::cout << "find Empty Block failed." << std::endl;
+			return false;
+		}
+		File newFile;
+		Dir fatherDir;
+		file_opt.move2offset_short(dir_off);
+		file_opt.readData(fatherDir.getDataCharPtr(), fatherDir.getDataSize());
+		Stat st;
+		st.type = T_file;
+		st.dev = newOff;
+		st.size = 0;
+		newFile.setStat(st);
+		newFile.changeFatherOff(dir_off);
+		newFile.setName(back_name);
+		newFile.changeBrother(fatherDir.getSonFileHead());
+		fatherDir.changeSonFileHead(newOff);
+		file_opt.move2offset_short(dir_off);
+		file_opt.saveData(fatherDir.getDataCharPtr(), fatherDir.getDataSize());
+		file_opt.move2offset_short(newOff);
+		file_opt.saveData(newFile.getDataCharPtr(), newFile.getDataSize());
+		return true;
+	}
+	std::cout << DirName << ": create file failed." << std::endl;
+	return false;
+}
+
+bool FileSystem::cleanFileData(Offset FileData_Begin) {
+	while (FileData_Begin >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+		FileContent file_c;
+		file_opt.move2offset_short(FileData_Begin);
+		file_opt.readData(file_c.getDataCharPtr(), file_c.getDataSize());
+		// clean
+		file_opt.cleanBlock(FileData_Begin);
+		FileData_Begin = file_c.getBrotherOff();
+	}
+	return true;
+}
 
 // used for File
 // Input:     File_NAME
 // Output:    Boolen
-bool FileSystem::deleteFile(const string DirName) {}
+bool FileSystem::deleteFile(const string DirName) {
+	std::list<string> pathList;
+	PathSpliter(DirName, '/', pathList);
+	Block* pathB = nullptr;
+	if (pathList.size() == 0) {
+		std::cout << "path is empty!" << std::endl;
+		return false;
+	}
+	if (pathList.size() == 1) {
+		// create Dir in Fat1 AND Fat2
+		Offset fat_offset = file_opt.findFat1Block(T_file, pathList.front());
+		if (!file_opt.getLastFindBool()) {
+			std::cout << pathList.front() << " not found!" << std::endl;
+			return false;
+		}
+		// delete
+		File file_d;
+		file_opt.move2offset_short(fat_offset);
+		file_opt.readData(file_d.getDataCharPtr(), file_d.getDataSize());
+		if (!cleanFileData(file_d.getFileData())) {
+			std::cout << "clean file failed!" << std::endl;
+			return false;
+		}
+		file_opt.cleanFatBlock(fat_offset);
+		return true;
+	}
+	// long path
+	// FAT1
+	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
+	if (!file_opt.getLastFindBool()) {
+		std::cout << pathList.front() << " not found" << std::endl;
+		return false;
+	}
+	pathList.pop_front();
+	string back_name = pathList.back();
+	pathList.pop_back();
+	Offset dir_off = findLongPath(Fat1_offset, pathList);
+	// std::cout << "dir: " << dir_off << std::endl;
+	if (dir_off >= HEAD_SIZE) {
+		Offset FileHere = findDirSonFile(dir_off, back_name);
+		if (FileHere >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+			// delete
+			File file_d;
+			file_opt.move2offset_short(FileHere);
+			file_opt.readData(file_d.getDataCharPtr(), file_d.getDataSize());
+			if (!cleanFileData(file_d.getFileData())) {
+				std::cout << "clean file failed!" << std::endl;
+				return false;
+			}
+
+			// chang link
+			// if father link you?
+			Dir fatherDir;
+			file_opt.move2offset_short(dir_off);
+			file_opt.readData(fatherDir.getDataCharPtr(), fatherDir.getDataSize());
+			// Dir nowDir;
+			// file_opt.move2offset_short(FileHere);
+			// file_opt.readData(file_d.getDataCharPtr(), file_d.getDataSize());
+			if (fatherDir.getSonFileHead() == FileHere) {
+				fatherDir.changeSonFileHead(file_d.getBrotherOff());
+				file_opt.move2offset_short(dir_off);
+				file_opt.saveData(fatherDir.getDataCharPtr(), fatherDir.getDataSize());
+			} else {
+				Offset lastFile_offset = fatherDir.getSonFileHead();
+				while (true) {
+					File file_data;
+					file_opt.move2offset_short(lastFile_offset);
+					file_opt.readData(file_data.getDataCharPtr(), file_data.getDataSize());
+					if (file_data.getBrotherOff() == FileHere) {
+						file_data.changeBrother(file_d.getBrotherOff());
+						file_opt.move2offset_short(lastFile_offset);
+						file_opt.saveData(file_data.getDataCharPtr(), file_data.getDataSize());
+						break;
+					}
+					lastFile_offset = file_data.getBrotherOff();
+				}
+			}
+
+			file_opt.cleanBlock(FileHere);
+			return true;
+		}
+		std::cout << "failed to find " << back_name << std::endl;
+		return false;
+	}
+	std::cout << DirName << ": delete dir failed." << std::endl;
+	return false;
+}
 
 // used for File
 // Input:     FILE_DESCRIPTOR

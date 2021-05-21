@@ -8,11 +8,6 @@
 #include "File.h"
 #include "FileData.h"
 
-using F_D = int;
-using W_LEN = int;
-using R_LEN = int;
-using W_RET = int;
-using R_RET = int;
 using string = std::string;
 
 class FileOptor {

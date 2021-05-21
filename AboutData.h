@@ -7,8 +7,8 @@ class DirData {
 public:
 	Stat st;
 	char name[32];
-	Offset sonDir = 0, sonFile = 0;
 	Offset father = 0, brother = 0;
+	Offset sonDir = 0, sonFile = 0;
 };
 // using DirData_ptr = DirData*;
 // using DirData_use = DirData&;
