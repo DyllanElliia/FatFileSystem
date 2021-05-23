@@ -99,7 +99,7 @@ bool FileOptor::saveData(char* b, int len) {
 	return true;
 }
 
-Offset FileOptor::findEmptyBlock() {
+Offset FileOptor::findEmptyBlock(int times) {
 	if (lastFindResult)
 		getLastFindBool();
 	Offset blockOffset = HEAD_SIZE + FAT1_SIZE + FAT2_SIZE;
@@ -110,10 +110,14 @@ Offset FileOptor::findEmptyBlock() {
 		char blockData[BLOCK_SIZE];
 		f.read(blockData, BLOCK_SIZE * sizeof(char));
 		if (((DirData*)blockData)->st.dev == 0) {
-			blockOffset += BLOCK_SIZE * i;
-			lastFindResult = true;
-			std::cout << "find" << std::endl;
-			break;
+			if (times > 0) {
+				times--;
+			} else {
+				blockOffset += BLOCK_SIZE * i;
+				lastFindResult = true;
+				// std::cout << "find" << std::endl;
+				break;
+			}
 		}
 	}
 	move2offset_short(f_offset);
@@ -134,7 +138,7 @@ Offset FileOptor::findEmptyFatBlock() {
 		if (((DirData*)blockData)->st.dev == 0) {
 			blockOffset += BLOCK_SIZE * i;
 			lastFindResult = true;
-			std::cout << "find" << std::endl;
+			// std::cout << "find" << std::endl;
 			break;
 		}
 	}

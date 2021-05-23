@@ -79,3 +79,11 @@ bool File::changeStSize(int size) {
 Offset File::getFileData() {
 	return data.message;
 }
+bool File::changeFileData(Offset o) {
+	data.message = o;
+	return true;
+}
+
+char* File::getDataptr() {
+	return nullptr;
+}

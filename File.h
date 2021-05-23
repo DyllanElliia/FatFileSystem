@@ -33,4 +33,7 @@ public:
 	// for File
 	bool changeStSize(int size);
 	Offset getFileData();
+	bool changeFileData(Offset o);
+	// for FileContent
+	char* getDataptr();
 };

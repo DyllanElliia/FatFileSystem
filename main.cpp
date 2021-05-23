@@ -158,6 +158,28 @@ int main(int argc, char const* argv[]) {
 				  << ": stat " << (fs.fstat(fd, &st) ? "true" : "false") << std::endl;
 		fs.close(fd);
 	}
+	string path = "/a.txt";
+	F_D fd = fs.open(path);
+	string result;
+	std::cout << "write len " << fs.write(fd, "afklasjdflk;aj") << std::endl;
+	std::cout << path << " read len " << fs.read(fd, result) << ", data \"" << result << "\"" << std::endl;
+	fs.close(fd);
+
+	result = "";
+	path = "/a.txt";
+	fd = fs.open(path);
+	std::cout << "write len " << fs.write(fd, "aasl;kddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddzxvccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc;aj") << std::endl;
+	result;
+	std::cout << path << " read len " << fs.read(fd, result) << ", data \"" << result << "\"" << std::endl;
+	fs.close(fd);
+
+	result = "";
+	path = "/a/b/zzf";
+	fd = fs.open(path);
+	std::cout << "write len " << fs.write(fd, "aasl;kdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddzxcvuiiiiiiiiiiiiiiiiiiiiiiiiiiiopixucvopizxuopizxcuvopjwsdlk;fjaujop[zx3worjqsl\ndkfvjaxopdirtqwerojfkl;sxcjnfvweuiopruioasdnm,.zxuio;qwiojkl;aslnm,.zxweruioweruioasflxcvnqwertuid\nddzxvccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc;aj") << std::endl;
+	result;
+	std::cout << path << " read len " << fs.read(fd, result) << ", data \"" << result << "\"" << std::endl;
+	fs.close(fd);
 
 	// std::cout << "/b"
 	// 		  << ": delete " << (fs.deleteDir("/b") ? "true" : "false") << std::endl;

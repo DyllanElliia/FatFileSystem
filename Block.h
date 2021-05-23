@@ -34,6 +34,9 @@ public:
 	virtual std::string getName() = 0;
 	// for File
 	virtual Offset getFileData() = 0;
+	virtual bool changeFileData(Offset o) = 0;
 	// for File AND FileContent
 	virtual bool changeStSize(int size) = 0;
+	// for FileContent
+	virtual char* getDataptr() = 0;
 };

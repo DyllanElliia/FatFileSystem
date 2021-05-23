@@ -83,3 +83,10 @@ bool Dir::changeStSize(int size) {
 Offset Dir::getFileData() {
 	return -1;
 }
+bool Dir::changeFileData(Offset o) {
+	return false;
+}
+
+char* Dir::getDataptr() {
+	return nullptr;
+}

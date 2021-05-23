@@ -724,11 +724,135 @@ bool FileSystem::deleteFile(const string DirName) {
 //            Data
 //            Write_len
 // Output:    Write_Return
-W_RET FileSystem::write(const F_D fd, const string data, W_LEN len) {}
+W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
+	W_RET w_len = 0;
+	// std::cout << w_len << " " << len << std::endl;
+	Offset file_off = fdBuf.getOff(fd);
+	if (file_off < HEAD_SIZE) {
+		std::cout << "Please open the file before you write." << std::endl;
+		return w_len;
+	}
+	if (len == -1 && len > data.size())
+		len = data.size();
+	if (len < 0) {
+		std::cout << "len must >= 0" << std::endl;
+		return w_len;
+	}
+
+	Offset fileContent_off;
+	File file_data;
+	file_opt.move2offset_short(file_off);
+	file_opt.readData(file_data.getDataCharPtr(), file_data.getDataSize());
+	fileContent_off = file_data.getFileData();
+
+	if (!cleanFileData(fileContent_off)) {
+		std::cout << "failed to clean file!" << std::endl;
+		return w_len;
+	}
+
+	if (len == 0) {
+		file_data.changeFileData(0);
+		file_opt.move2offset_short(file_off);
+		file_opt.saveData(file_data.getDataCharPtr(), file_data.getDataSize());
+		return w_len;
+	}
+	file_data.changeStSize(len);
+
+	Offset fileC_off_begin, fileC_off_now;
+	FileContent file_c;
+	fileC_off_now = file_opt.findEmptyBlock();
+	if (!file_opt.getLastFindBool()) {
+		std::cout << "failed to find first block!" << std::endl;
+		return w_len;
+	}
+	fileC_off_begin = fileC_off_now;
+	Stat st;
+	st.type = T_file_content;
+	st.dev = fileC_off_now;
+	st.size = 0;
+	int count = 0;
+	char* fc_data = file_c.getDataptr();
+	data.push_back(' ');
+	for (auto i : data) {
+		if (count == F_DATA_LEN_LIMIT) {
+			// std::cout << fileC_off_now << std::endl;
+			st.size = count;
+			file_c.setStat(st);
+			Offset save_now = fileC_off_now;
+			fileC_off_now = file_opt.findEmptyBlock(1);
+			if (!file_opt.getLastFindBool()) {
+				std::cout << "failed to find empty block!" << std::endl;
+				return w_len;
+			}
+			file_c.changeBrother(fileC_off_now);
+			file_opt.move2offset_short(save_now);
+			file_opt.saveData(file_c.getDataCharPtr(), file_c.getDataSize());
+			count = 0;
+			st.dev = fileC_off_now;
+		}
+		if (len == 0) {
+			// std::cout << fileC_off_now << std::endl;
+			st.size = count;
+			file_c.setStat(st);
+			std::cout << file_c.getStat().size << std::endl;
+			file_opt.move2offset_short(fileC_off_now);
+			file_c.changeBrother(0);
+			file_opt.saveData(file_c.getDataCharPtr(), file_c.getDataSize());
+			break;
+		}
+		fc_data[count++] = i;
+		len--;
+		w_len++;
+	}
+	// std::cout << fileC_off_begin << std::endl;
+	file_data.changeFileData(fileC_off_begin);
+	file_opt.move2offset_short(file_off);
+	file_opt.saveData(file_data.getDataCharPtr(), file_data.getDataSize());
+	return w_len;
+}
 
 // used for File
 // Input:     FILE_DESCRIPTOR
 //            Data
 //            Read_len
 // Output:    Read_Return
-R_RET read(const F_D fd, const string& data, R_LEN len) {}
+R_RET FileSystem::read(const F_D fd, string& data, R_LEN len) {
+	R_RET r_len = 0;
+	// std::cout << r_len << " " << len << std::endl;
+	Offset file_off = fdBuf.getOff(fd);
+	if (file_off < HEAD_SIZE) {
+		std::cout << "Please open the file before you write." << std::endl;
+		return r_len;
+	}
+	if (len == -1)
+		len = 1000000007;
+	if (len < 0 && len != -1) {
+		std::cout << "len must >= 0" << std::endl;
+		return r_len;
+	}
+
+	Offset fileContent_off;
+	File file_data;
+	file_opt.move2offset_short(file_off);
+	file_opt.readData(file_data.getDataCharPtr(), file_data.getDataSize());
+	fileContent_off = file_data.getFileData();
+
+	while (fileContent_off >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+		// std::cout << fileContent_off << std::endl;
+		if (r_len >= len)
+			break;
+
+		FileContent file_c;
+		file_opt.move2offset_short(fileContent_off);
+		file_opt.readData(file_c.getDataCharPtr(), file_c.getDataSize());
+		// read
+		char* fc_data = file_c.getDataptr();
+		// std::cout << file_c.getStat().dev << std::endl;
+		for (int i = 0; i < file_c.getStat().size; ++i) {
+			data.push_back(fc_data[i]);
+			r_len++;
+		}
+		fileContent_off = file_c.getBrotherOff();
+	}
+	return r_len;
+}

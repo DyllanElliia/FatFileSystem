@@ -44,7 +44,7 @@ public:
 	bool readData(char* b, int len);
 	bool saveData(char* b, int len);
 
-	Offset findEmptyBlock();
+	Offset findEmptyBlock(int times = 0);
 	Offset findEmptyFatBlock();
 	// Offset findBlock(S_type type, string name);
 	Offset findFat1Block(S_type type, string name);
