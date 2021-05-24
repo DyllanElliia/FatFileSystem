@@ -44,7 +44,15 @@ std::list<string> User::split(string str) {
       std::sregex_token_iterator(str.begin(), str.end(), ws_re, -1),
       std::sregex_token_iterator());
 
-  v.pop_front();
+  for (auto i = v.begin(); i != v.end();) {
+    if ((*i).size() == 0) {
+      i = v.erase(i);
+    } else {
+      ++i;
+    }
+  }
+
+  // v.pop_front();
   return v;
 }
 
