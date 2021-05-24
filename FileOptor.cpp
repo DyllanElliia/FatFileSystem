@@ -19,7 +19,7 @@ FileOptor::FileOptor() {
 		f.open("./FAT_DATA", std::ios::in | std::ios::out | std::ios::binary);
 		std::cout << "-----------Initializing FAT_DATA-----------" << std::endl;
 		struct head_data head_save;
-		strcpy(head_save.systemName, "FAT-Based File System");
+		strcpy(head_save.systemName, "FAT-Based System");
 		strcpy(head_save.producerName, "Dyllan & Taka");
 		strcpy(head_save.vendorName, "UESTC");
 		head_save.emptyFatBlockNumber = FAT_BLOCK_NUM;
