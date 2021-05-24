@@ -435,7 +435,7 @@ bool FileSystem::openDir(const string cdPath) {
   PathSpliter(cdPath, '/', pathList);
   if (pathList.size() == 0) {
     nowDir_off = 0;
-    return false;
+    return true;
   }
   if (pathList.size() == 1) {
     Offset fat_off = file_opt.findFat1Block(T_dir, pathList.front());
@@ -735,6 +735,9 @@ bool FileSystem::deleteFile(const string DirName) {
 //            Write_len
 // Output:    Write_Return
 W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
+  if (fd == 1) {
+    std::cout << data.substr(0, len) << std::endl;
+  }
   W_RET w_len = 0;
   // std::cout << w_len << " " << len << std::endl;
   Offset file_off = fdBuf.getOff(fd);
