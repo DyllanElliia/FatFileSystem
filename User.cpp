@@ -159,7 +159,6 @@ void User::cat(string inFileName, string outFileName) {
   }
   string buf;
   int len = fs.read(fd, buf);
-  std::cout << buf << std::endl;
   fs.close(fd);
   fd = fs.open(outFile);
   if (fd < 0) {
