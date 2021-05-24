@@ -180,7 +180,7 @@ F_D FileSystem::open(const string PathName) {
 		if (fd_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
 			fd_off = findDirSonDir(dir_off, back_name);
 			if (fd_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-				std::cout << PathName << " already exists!" << std::endl;
+				std::cout << PathName << " not found!" << std::endl;
 				return -1;
 			}
 		}
