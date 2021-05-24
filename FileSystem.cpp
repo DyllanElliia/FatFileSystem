@@ -523,20 +523,19 @@ nameList FileSystem::getName() {
 	Offset sonDir_off = nowDir.getSonDirHead();
 	Offset sonFile_off = nowDir.getSonFileHead();
 
-	while (sonDir_off) {
-		Dir sonDir;
-		file_opt.move2offset_short(sonDir_off);
-		file_opt.readData(sonDir.getDataCharPtr(), sonDir.getDataSize());
-		nList.nameL.push_back({T_dir, sonDir.getName()});
-		sonDir_off = sonDir.getBrotherOff();
-	}
-
 	while (sonFile_off) {
 		File sonFile;
 		file_opt.move2offset_short(sonFile_off);
 		file_opt.readData(sonFile.getDataCharPtr(), sonFile.getDataSize());
 		nList.nameL.push_back({T_file, sonFile.getName()});
 		sonFile_off = sonFile.getBrotherOff();
+	}
+	while (sonDir_off) {
+		Dir sonDir;
+		file_opt.move2offset_short(sonDir_off);
+		file_opt.readData(sonDir.getDataCharPtr(), sonDir.getDataSize());
+		nList.nameL.push_back({T_dir, sonDir.getName()});
+		sonDir_off = sonDir.getBrotherOff();
 	}
 	return nList;
 }
