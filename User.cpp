@@ -29,7 +29,9 @@ string User::fmtName(string name) {
     return fmtName;
   } else {
     string n = fs.getDirName();
-    n.push_back('/');
+    if (n != "/") {
+      n.push_back('/');
+    }
     n += name;
     fmtName = User::fmtName(n);
     return fmtName;
@@ -138,7 +140,7 @@ void User::cat(string fileName) {
   string file = this->fmtName(fileName);
   F_D fd = fs.open(file);
   if (fd == -1) {
-    std::cout << "Cannot open file " << file << std::endl;
+    std::cout << "cat: Cannot open file " << file << std::endl;
     return;
   }
   string buf;
@@ -156,6 +158,7 @@ void User::cat(string inFileName, string outFileName) {
   }
   string buf;
   int len = fs.read(fd, buf);
+  std::cout << buf << std::endl;
   fs.close(fd);
   fd = fs.open(outFile);
   if (fd < 0) {
@@ -168,7 +171,7 @@ void User::cat(string inFileName, string outFileName) {
       return;
     }
   }
-  fs.write(fd, buf);
+  fs.write(fd, buf, len);
   fs.close(fd);
 }
 
