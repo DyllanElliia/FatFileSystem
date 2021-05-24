@@ -5,7 +5,8 @@
 FileSystem::FileSystem() {}
 FileSystem::~FileSystem() {}
 
-bool FileSystem::PathSpliter(string path, const char split, std::list<string>& result) {
+bool FileSystem::PathSpliter(string path, const char split,
+							 std::list<string>& result) {
 	std::istringstream iss(path);		// 输入流
 	string token;						// 接收缓冲区
 	while (getline(iss, token, split))	// 以split为分隔符
@@ -40,7 +41,8 @@ Offset FileSystem::findDirSonDir(Offset off_begin, string name) {
 	while (dir_off >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
 		file_opt.move2offset_short(dir_off);
 		Dir blockData;
-		if (!file_opt.readData(blockData.getDataCharPtr(), blockData.getDataSize())) {
+		if (!file_opt.readData(blockData.getDataCharPtr(),
+							   blockData.getDataSize())) {
 			std::cout << "read data failed. Path: " << name << std::endl;
 			return 0;
 		}
@@ -75,7 +77,8 @@ Offset FileSystem::findDirSonFile(Offset off_begin, string name) {
 	while (dir_off >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
 		file_opt.move2offset_short(dir_off);
 		File blockData;
-		if (!file_opt.readData(blockData.getDataCharPtr(), blockData.getDataSize())) {
+		if (!file_opt.readData(blockData.getDataCharPtr(),
+							   blockData.getDataSize())) {
 			std::cout << "read data failed. Path: " << name << std::endl;
 			return 0;
 		}
@@ -107,14 +110,16 @@ Offset FileSystem::findLongPath(Offset off_begin, std::list<string>& pathList) {
 		if (dir_begin == 0)
 			return 0;
 		if (dir_begin < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-			std::cout << "error path. " << path_name << " can not be found." << std::endl;
+			std::cout << "error path. " << path_name << " can not be found."
+					  << std::endl;
 			return 0;
 		}
 		dir_off = dir_begin;
 		while (dir_off >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
 			file_opt.move2offset_short(dir_off);
 			Dir blockData;
-			if (!file_opt.readData(blockData.getDataCharPtr(), blockData.getDataSize())) {
+			if (!file_opt.readData(blockData.getDataCharPtr(),
+								   blockData.getDataSize())) {
 				std::cout << "read data failed. Path: " << path_name << std::endl;
 				return 0;
 			}
@@ -286,7 +291,8 @@ bool FileSystem::createDir(const string DirName) {
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
 	// std::cout << "dir: " << dir_off << std::endl;
 	if (dir_off >= HEAD_SIZE) {
-		if (findDirSonDir(dir_off, back_name) >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+		if (findDirSonDir(dir_off, back_name) >=
+			HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
 			std::cout << DirName << " already exists!" << std::endl;
 			return false;
 		}
@@ -411,7 +417,8 @@ bool FileSystem::deleteDir(const string DirName) {
 					if (dir_data.getBrotherOff() == DirHere) {
 						dir_data.changeBrother(nowDir.getBrotherOff());
 						file_opt.move2offset_short(lastDir_offset);
-						file_opt.saveData(dir_data.getDataCharPtr(), dir_data.getDataSize());
+						file_opt.saveData(dir_data.getDataCharPtr(),
+										  dir_data.getDataSize());
 						break;
 					}
 					lastDir_offset = dir_data.getBrotherOff();
@@ -489,7 +496,8 @@ string FileSystem::getDirName() {
 // Output:    Boolen
 nameList FileSystem::getName() {
 	nameList nList;
-	// for FAT again. i hate fat. i think i shoule design a better fat file struct at next time.
+	// for FAT again. i hate fat. i think i shoule design a better fat file struct
+	// at next time.
 	if (nowDir_off == 0) {
 		Offset fat_off = HEAD_SIZE;
 		for (int i = 0; i < FAT_BLOCK_NUM; ++i) {
@@ -590,7 +598,8 @@ bool FileSystem::createFile(const string DirName) {
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
 	// std::cout << "dir: " << dir_off << std::endl;
 	if (dir_off >= HEAD_SIZE) {
-		if (findDirSonFile(dir_off, back_name) >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+		if (findDirSonFile(dir_off, back_name) >=
+			HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
 			std::cout << DirName << " already exists!" << std::endl;
 			return false;
 		}
@@ -704,11 +713,13 @@ bool FileSystem::deleteFile(const string DirName) {
 				while (true) {
 					File file_data;
 					file_opt.move2offset_short(lastFile_offset);
-					file_opt.readData(file_data.getDataCharPtr(), file_data.getDataSize());
+					file_opt.readData(file_data.getDataCharPtr(),
+									  file_data.getDataSize());
 					if (file_data.getBrotherOff() == FileHere) {
 						file_data.changeBrother(file_d.getBrotherOff());
 						file_opt.move2offset_short(lastFile_offset);
-						file_opt.saveData(file_data.getDataCharPtr(), file_data.getDataSize());
+						file_opt.saveData(file_data.getDataCharPtr(),
+										  file_data.getDataSize());
 						break;
 					}
 					lastFile_offset = file_data.getBrotherOff();

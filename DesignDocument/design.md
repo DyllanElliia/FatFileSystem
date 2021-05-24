@@ -8,7 +8,7 @@
 -   cd
     -   dirName
 -   cat
-    -   FileName
+    -   fileName
 -   echo
     -   string
     -   (optional) >
@@ -70,3 +70,16 @@
     -   W_RET write(F_D n, string data, W_LEN len);
     -   R_RET read(F_D n, string& data, R_LEN len);
 
+- [x] mkdir
+- [x] rmdir
+- [x] rm
+- [x] ls
+- [x] cd
+- [x] cat
+- [x] echo
+- [x] find
+- [x] tree
+- [x] exit
+- [x] pwd
+- [x] fmtName
+- [x] split
