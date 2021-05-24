@@ -1,4 +1,4 @@
-#include "Console.h"
+#include "./Console.h"
 
 #include <cstring>
 #include <ostream>
@@ -20,6 +20,7 @@ Console::Console() {
   f2["find"] = &User::find;
   std::cout << "Console init over\n";
 }
+
 
 void Console::run() {
   // auto console = new Console();

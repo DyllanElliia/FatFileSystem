@@ -1,5 +1,5 @@
-
-#include "User.h"
+#pragma once
+#include "./User.h"
 
 class Console {
  public:
