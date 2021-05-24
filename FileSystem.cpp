@@ -137,9 +137,9 @@ Offset FileSystem::findLongPath(Offset off_begin, std::list<string>& pathList) {
 // used for File & Dir
 // Input:     path
 // Output:    FILE_DESCRIPTOR
-F_D FileSystem::open(const string FilePathName) {
+F_D FileSystem::open(const string PathName) {
 	std::list<string> pathList;
-	PathSpliter(FilePathName, '/', pathList);
+	PathSpliter(PathName, '/', pathList);
 	Block* pathB = nullptr;
 	if (pathList.size() == 0) {
 		std::cout << "path is empty!" << std::endl;
@@ -149,14 +149,17 @@ F_D FileSystem::open(const string FilePathName) {
 		// create File in Fat1 AND Fat2
 		Offset fat_offset = file_opt.findFat1Block(T_file, pathList.front());
 		if (!file_opt.getLastFindBool()) {
-			std::cout << pathList.front() << " not found!" << std::endl;
-			return -1;
+			fat_offset = file_opt.findFat1Block(T_dir, pathList.front());
+			if (!file_opt.getLastFindBool()) {
+				std::cout << pathList.front() << " not found!" << std::endl;
+				return -1;
+			}
 		}
 		F_D fd = fdBuf.get();
 		if (fdBuf.set(fd, fat_offset))
 			return fd;
 		else {
-			std::cout << FilePathName << " has been opened!" << std::endl;
+			std::cout << PathName << " has been opened!" << std::endl;
 			return -1;
 		}
 	}
@@ -173,20 +176,23 @@ F_D FileSystem::open(const string FilePathName) {
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
 	// std::cout << "dir: " << dir_off << std::endl;
 	if (dir_off >= HEAD_SIZE) {
-		Offset file_off = findDirSonFile(dir_off, back_name);
-		if (file_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-			std::cout << FilePathName << " already exists!" << std::endl;
-			return -1;
+		Offset fd_off = findDirSonFile(dir_off, back_name);
+		if (fd_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+			fd_off = findDirSonDir(dir_off, back_name);
+			if (fd_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
+				std::cout << PathName << " already exists!" << std::endl;
+				return -1;
+			}
 		}
 		F_D fd = fdBuf.get();
-		if (fd && fdBuf.set(fd, file_off))
+		if (fd && fdBuf.set(fd, fd_off))
 			return fd;
 		else {
-			std::cout << FilePathName << " has been opened!" << std::endl;
+			std::cout << PathName << " has been opened!" << std::endl;
 			return -1;
 		}
 	}
-	std::cout << FilePathName << ": open file failed." << std::endl;
+	std::cout << PathName << ": open file failed." << std::endl;
 	return -1;
 }
 
