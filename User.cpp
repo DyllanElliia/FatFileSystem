@@ -104,14 +104,15 @@ void User::ls() {
   FileSystem::nameList nl = fs.getName();
   std::cout << "name\ttype\tsize" << std::endl;
   for (auto i : nl.nameL) {
-    F_D fd = fs.open(i.name);
+    string name = this->fmtName(i.name);
+    F_D fd = fs.open(name);
     if (fd < 0) {
-      std::cout << "ls: Cannot open file " << i.name << std::endl;
+      std::cout << "ls: Cannot open file " << name << std::endl;
       continue;
     }
     Stat stat;
     if (!fs.fstat(fd, &stat)) {
-      std::cout << "ls: Cannot stat " << i.name << std::endl;
+      std::cout << "ls: Cannot stat " << name << std::endl;
       fs.close(fd);
       continue;
     }
@@ -162,7 +163,7 @@ void User::cat(string inFileName, string outFileName) {
   fs.close(fd);
   fd = fs.open(outFile);
   if (fd < 0) {
-    if (fs.createFile(outFile)) {
+    if (!fs.createFile(outFile)) {
       std::cout << "cat: Cannot create file " << outFile << std::endl;
       return;
     }
@@ -171,7 +172,13 @@ void User::cat(string inFileName, string outFileName) {
       return;
     }
   }
-  fs.write(fd, buf, len);
+  Stat stat;
+  fs.fstat(fd, &stat);
+  if (stat.type == T_file) {
+    fs.write(fd, buf);
+  } else {
+    std::cout << "cat: " << outFile << " is a directory." << std::endl;
+  }
   fs.close(fd);
 }
 
@@ -180,10 +187,18 @@ void User::echo(string data, string filePathName) {
   string filePath = this->fmtName(filePathName);
   F_D fd = fs.open(filePath);
   if (fd > 0) {
-    std::cout << "echo: " << filePath << " is exists, rewriting..."
-              << std::endl;
+    Stat stat;
+    fs.fstat(fd, &stat);
+    if (stat.type == T_file) {
+      std::cout << "echo: " << filePath << " is exists, rewriting..."
+                << std::endl;
+    } else {
+      std::cout << "echo: " << filePath << " is a directory, cannot rewrite."
+                << std::endl;
+      fs.close(fd);
+      return;
+    }
     fs.close(fd);
-    fs.deleteFile(filePath);
   }
   if (!fs.createFile(filePath)) {
     std::cout << "echo: Cannot create file " << filePath << std::endl;
