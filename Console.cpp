@@ -21,7 +21,6 @@ Console::Console() {
   std::cout << "Console init over\n";
 }
 
-
 void Console::run() {
   // auto console = new Console();
 
@@ -64,18 +63,13 @@ void Console::exec(string con, Console& console) {
     i = control.begin();
   }
   control.pop_front();
-  std::cout << *i << std::endl;
-  for (auto&& j : control) {
-    std::cout << j << "\t";
-  }
-  std::cout << std::endl;
   if (*i == "ls" || *i == "exit" || *i == "pwd") {
     if (!control.empty()) {
       execFailed(*i);
       return;
     }
     (user->*(console.f0[*i]))();
-    std::cout << "exec 0 over;\n";
+    // std::cout << "exec 0 over;\n";
   } else {
     if (control.empty() || control.size() > 2) {
       execFailed(*i);
@@ -88,10 +82,10 @@ void Console::exec(string con, Console& console) {
       }
       if (*i == "tree") {
         (user->*(console.fi[*i]))(std::stoi(*control.begin()));
-        std::cout << "exec i over;\n";
+        // std::cout << "exec i over;\n";
       } else {
         (user->*(console.f1[*i]))(*control.begin());
-        std::cout << "exec 1 over;\n";
+        // std::cout << "exec 1 over;\n";
       }
     } else if (control.size() == 2) {
       if (!console.f2.count(*i)) {
@@ -102,7 +96,7 @@ void Console::exec(string con, Console& console) {
       control.pop_front();
       string para2 = *control.begin();
       (user->*(console.f2[*i]))(para1, para2);
-      std::cout << "exec 2 over;\n";
+      // std::cout << "exec 2 over;\n";
     }
   }
 }

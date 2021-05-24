@@ -18,6 +18,10 @@ string User::fmtName(string name) {
         st.pop_back();
       }
     }
+    if (st.empty()) {
+      fmtName.push_back('/');
+      return fmtName;
+    }
     for (auto&& i : st) {
       fmtName.push_back('/');
       fmtName += i;
@@ -43,56 +47,60 @@ std::list<string> User::split(string str) {
 }
 
 void User::mkdir(string dirName) {
-  F_D fd = fs.open(dirName);
+  string dir = this->fmtName(dirName);
+  F_D fd = fs.open(dir);
   if (fd != -1) {
-    std::cout << "mkdir: " << dirName << ": File exists" << std::endl;
+    std::cout << "mkdir: " << dir << ": File exists" << std::endl;
     fs.close(fd);
     return;
   }
-  bool result = fs.createDir(dirName);
+  bool result = fs.createDir(dir);
   if (!result) {
-    std::cout << "Error: Cannot create dir " << dirName << std::endl;
+    std::cout << "Error: Cannot create dir " << dir << std::endl;
   }
 }
 
 void User::rmdir(string dirName) {
   F_D fd;
-  if ((fd = fs.open(dirName)) < 0) {
-    std::cout << "rmdir: Cannot find dir " << dirName << std::endl;
+
+  string dir = this->fmtName(dirName);
+  if ((fd = fs.open(dir)) < 0) {
+    std::cout << "rmdir: Cannot find dir " << dir << std::endl;
   }
   Stat stat;
   if (!fs.fstat(fd, &stat)) {
-    std::cout << "rmdir: Cannot stat dir " << dirName << std::endl;
+    std::cout << "rmdir: Cannot stat dir " << dir << std::endl;
     fs.close(fd);
     return;
   }
   if (stat.type != T_dir) {
-    std::cout << "rmdir: " << dirName << " is not a dir" << std::endl;
+    std::cout << "rmdir: " << dir << " is not a dir" << std::endl;
     fs.close(fd);
     return;
   }
   fs.close(fd);
-  if (!fs.deleteDir(dirName)) {
-    std::cout << "rmdir: error: delete dir " << dirName << " failed"
-              << std::endl;
+  if (!fs.deleteDir(dir)) {
+    std::cout << "rmdir: error: delete dir " << dir << " failed" << std::endl;
   }
 }
 
 void User::rm(string fileName) {
-  int fd = fs.open(fileName);
+  string file = this->fmtName(fileName);
+  int fd = fs.open(file);
   if (fd < 0) {
-    std::cout << "rm: file " << fileName << " not exists" << std::endl;
+    std::cout << "rm: file " << file << " not exists" << std::endl;
     return;
   }
   fs.close(fd);
-  bool result = fs.deleteFile(fileName);
+  bool result = fs.deleteFile(file);
   if (!result) {
-    std::cout << "rm: delete file " << fileName << "failed" << std::endl;
+    std::cout << "rm: delete file " << file << "failed" << std::endl;
   }
 }
 
 void User::ls() {
   FileSystem::nameList nl = fs.getName();
+  std::cout << "name\ttype\tsize" << std::endl;
   for (auto i : nl.nameL) {
     F_D fd = fs.open(i.name);
     if (fd < 0) {
@@ -106,20 +114,31 @@ void User::ls() {
       continue;
     }
     fs.close(fd);
-    std::cout << i.name << " " << stat.type << " " << stat.size << std::endl;
+    std::cout << i.name << "\t";
+    switch (stat.type) {
+      case T_dir:
+        std::cout << "dir\t\\";
+        break;
+      case T_file:
+        std::cout << "file\t" << stat.size << "byte";
+    }
+
+    std::cout << std::endl;
   }
 }
 
 void User::cd(string cdPath) {
-  if (!fs.openDir(cdPath)) {
-    std::cout << "cd: Cannot change dir " << cdPath << std::endl;
+  string path = this->fmtName(cdPath);
+  if (!fs.openDir(path)) {
+    std::cout << "cd: Cannot change dir " << path << std::endl;
   }
 }
 
 void User::cat(string fileName) {
-  F_D fd = fs.open(fileName);
+  string file = this->fmtName(fileName);
+  F_D fd = fs.open(file);
   if (fd == -1) {
-    std::cout << "Cannot open file " << fileName << std::endl;
+    std::cout << "Cannot open file " << file << std::endl;
     return;
   }
   string buf;
@@ -128,22 +147,24 @@ void User::cat(string fileName) {
   fs.close(fd);
 }
 void User::cat(string inFileName, string outFileName) {
-  F_D fd = fs.open(inFileName);
+  string inFile = this->fmtName(inFileName);
+  string outFile = this->fmtName(outFileName);
+  F_D fd = fs.open(inFile);
   if (fd == -1) {
-    std::cout << "cat: Cannot open file " << inFileName << std::endl;
+    std::cout << "cat: Cannot open file " << inFile << std::endl;
     return;
   }
   string buf;
   int len = fs.read(fd, buf);
   fs.close(fd);
-  fd = fs.open(outFileName);
+  fd = fs.open(outFile);
   if (fd < 0) {
-    if (fs.createFile(outFileName)) {
-      std::cout << "cat: Cannot create file " << outFileName << std::endl;
+    if (fs.createFile(outFile)) {
+      std::cout << "cat: Cannot create file " << outFile << std::endl;
       return;
     }
-    if ((fd = fs.open(outFileName)) < 0) {
-      std::cout << "cat: Cannot open file " << outFileName << std::endl;
+    if ((fd = fs.open(outFile)) < 0) {
+      std::cout << "cat: Cannot open file " << outFile << std::endl;
       return;
     }
   }
@@ -153,39 +174,42 @@ void User::cat(string inFileName, string outFileName) {
 
 void User::echo(string data) { fs.write(1, data); }
 void User::echo(string data, string filePathName) {
-  F_D fd = fs.open(filePathName);
+  string filePath = this->fmtName(filePathName);
+  F_D fd = fs.open(filePath);
   if (fd > 0) {
-    std::cout << "echo: " << filePathName << " is exists, rewriting..."
+    std::cout << "echo: " << filePath << " is exists, rewriting..."
               << std::endl;
     fs.close(fd);
-    fs.deleteFile(filePathName);
+    fs.deleteFile(filePath);
   }
-  if (!fs.createFile(filePathName)) {
-    std::cout << "echo: Cannot create file " << filePathName << std::endl;
+  if (!fs.createFile(filePath)) {
+    std::cout << "echo: Cannot create file " << filePath << std::endl;
     return;
   }
-  if ((fd = fs.open(filePathName)) < 0) {
-    std::cout << "echo: Cannot open file " << filePathName << std::endl;
+  if ((fd = fs.open(filePath)) < 0) {
+    std::cout << "echo: Cannot open file " << filePath << std::endl;
     return;
   }
   if (fs.write(fd, data) < 0) {
-    std::cout << "echo: Cannot write into file " << filePathName << std::endl;
+    std::cout << "echo: Cannot write into file " << filePath << std::endl;
   }
   fs.close(fd);
 }
 
 void User::find(string dirName, string fileName) {
   string current = fs.getDirName();
-  cd(dirName);
+  string dir = this->fmtName(dirName);
+  string file = this->fmtName(fileName);
+  cd(dir);
   nameList nl = fs.getName();
   for (auto i : nl.nameL) {
-    if (i.name == fileName) {
-      string f = dirName + "/" + fileName;
+    if (i.name == file) {
+      string f = dir + "/" + file;
       std::cout << f << std::endl;
     }
     if (i.type == T_dir) {
-      string f = dirName + "/" + fileName;
-      find(f, fileName);
+      string f = dir + "/" + file;
+      find(f, file);
     }
   }
   cd(current);
