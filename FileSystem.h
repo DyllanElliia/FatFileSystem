@@ -1,15 +1,24 @@
 #pragma once
 #include <list>
 
+#include "F_D_saver.h"
 #include "FileOptor.h"
-#include "stat.h"
 
 class FileSystem {
  private:
   FileOptor file_opt;
-  Block* nowDir = nullptr;
+  Offset nowDir_off = 0;
+  F_D_saver fdBuf;
+
+  Offset findLongPath(Offset off_begin, std::list<string>& pathList);
+  Offset findDirSonDir(Offset off_begin, string name);
+  Offset findDirSonFile(Offset off_begin, string name);
+  bool cleanFileData(Offset FileData_Begin);
 
  public:
+  FileSystem();
+  ~FileSystem();
+  bool PathSpliter(string path, const char split, std::list<string>& result);
   // used for File & Dir
   // Input:     path
   // Output:    FILE_DESCRIPTOR
@@ -74,13 +83,13 @@ class FileSystem {
   //            Data
   //            Write_len
   // Output:    Write_Return
-  W_RET write(const F_D fd, const string data, W_LEN len = -1);
+  W_RET write(const F_D fd, string data, W_LEN len = -1);
 
   // used for File
   // Input:     FILE_DESCRIPTOR
   //            Data
   //            Read_len
   // Output:    Read_Return
-  R_RET read(const F_D fd, const string& data, R_LEN len = -1);
+  R_RET read(const F_D fd, string& data, R_LEN len = -1);
 };
 using nameList = FileSystem::nameList;

@@ -41,6 +41,10 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "list": "cpp",
+        "sstream": "cpp",
+        "map": "cpp",
+        "xtree": "cpp"
     }
 }

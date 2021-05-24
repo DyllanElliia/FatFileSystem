@@ -11,14 +11,14 @@ File::~File() {}
 bool File::changeSonDirHead(Offset o) {
 	return false;
 }
-Offset File::getSonDirHead(Offset o) {
+Offset File::getSonDirHead() {
 	return -1;
 }
 // Son of File
 bool File::changeSonFileHead(Offset o) {
 	return false;
 }
-Offset File::getSonFileHead(Offset o) {
+Offset File::getSonFileHead() {
 	return -1;
 }
 // Data Transform
@@ -53,9 +53,16 @@ bool File::setStat(Stat st) {
 	data.st = st;
 	return true;
 }
+char* File::getDataCharPtr() {
+	return (char*)&data;
+}
 // for File AND Dir
 Offset File::getFatherOff() {
 	return data.father;
+}
+bool File::changeFatherOff(Offset o) {
+	data.father = o;
+	return true;
 }
 std::string File::getName() {
 	return std::string(data.name);
@@ -71,4 +78,12 @@ bool File::changeStSize(int size) {
 }
 Offset File::getFileData() {
 	return data.message;
+}
+bool File::changeFileData(Offset o) {
+	data.message = o;
+	return true;
+}
+
+char* File::getDataptr() {
+	return nullptr;
 }
