@@ -435,7 +435,7 @@ bool FileSystem::openDir(const string cdPath) {
 	PathSpliter(cdPath, '/', pathList);
 	if (pathList.size() == 0) {
 		nowDir_off = 0;
-		return false;
+		return true;
 	}
 	if (pathList.size() == 1) {
 		Offset fat_off = file_opt.findFat1Block(T_dir, pathList.front());
