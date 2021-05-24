@@ -4,13 +4,11 @@
 class Console {
  public:
   Console();
-  ~Console();
-  User user;
-  FileSystem fs;
+  User* user = new User();
   void run();
-  void exec(string con, Console &console);
+  void exec(string con, Console& console);
   void execFailed(string execName);
-  void useage();
+  void usage();
   std::list<string> split(string str);
 
  private:

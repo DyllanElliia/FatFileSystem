@@ -4,6 +4,8 @@
 #include <iostream>
 #include <regex>
 
+FileSystem& User::getFs() { return this->fs; }
+
 string User::fmtName(string name) {
   string fmtName;
   if (name[0] == '/') {

@@ -18,19 +18,26 @@ Console::Console() {
   f2["cat"] = &User::cat;
   f2["echo"] = &User::echo;
   f2["find"] = &User::find;
+  std::cout << "Console init over\n";
 }
 
 void Console::run() {
-  auto console = new Console();
+  // auto console = new Console();
+
   std::cout << "Fat File System Booting..." << std::endl;
-  std::cout << "To get help about this system, please use \"useage\"."
+  std::cout << "To get help about this system, please use \"usage\"."
             << std::endl;
+  FileSystem& fs = user->getFs();
   for (;;) {
     string con = fs.getDirName();
-    std::cout << "[" << con << "/]"
+    std::cout << "[" << con << "]"
               << "# ";
     std::getline(std::cin, con);
-    Console::exec(con, *console);
+    if (con == "usage") {
+      this->usage();
+    } else {
+      Console::exec(con, *this);
+    }
   }
 }
 
@@ -56,26 +63,34 @@ void Console::exec(string con, Console& console) {
     i = control.begin();
   }
   control.pop_front();
+  std::cout << *i << std::endl;
+  for (auto&& j : control) {
+    std::cout << j << "\t";
+  }
+  std::cout << std::endl;
   if (*i == "ls" || *i == "exit" || *i == "pwd") {
     if (!control.empty()) {
       execFailed(*i);
       return;
     }
-    (user.*(console.f0[*i]))();
+    (user->*(console.f0[*i]))();
+    std::cout << "exec 0 over;\n";
   } else {
     if (control.empty() || control.size() > 2) {
       execFailed(*i);
       return;
     }
     if (control.size() == 1) {
-      if (!console.f1.count(*i) || !console.fi.count(*i)) {
+      if (!console.f1.count(*i) && !console.fi.count(*i)) {
         execFailed(*i);
         return;
       }
       if (*i == "tree") {
-        (user.*(console.fi[*i]))(std::stoi(*control.begin()));
+        (user->*(console.fi[*i]))(std::stoi(*control.begin()));
+        std::cout << "exec i over;\n";
       } else {
-        (user.*(console.f1[*i]))(*control.begin());
+        (user->*(console.f1[*i]))(*control.begin());
+        std::cout << "exec 1 over;\n";
       }
     } else if (control.size() == 2) {
       if (!console.f2.count(*i)) {
@@ -85,33 +100,34 @@ void Console::exec(string con, Console& console) {
       string para1 = *control.begin();
       control.pop_front();
       string para2 = *control.begin();
-      (user.*(console.f2[*i]))(para1, para2);
+      (user->*(console.f2[*i]))(para1, para2);
+      std::cout << "exec 2 over;\n";
     }
   }
 }
 
-void Console::useage() {
+void Console::usage() {
   std::cout << "COMMAND and SYNOPSIS:\n"
             << "\tls: list all files and directories;\n"
-            << "\t\tuseage: ls\n"
+            << "\t\tusage: ls\n"
             << "\tmkdir: create a directory;\n"
-            << "\t\tuseage: mkdir dirName\n"
+            << "\t\tusage: mkdir dirName\n"
             << "\trmdir: remove a directory;\n"
-            << "\t\tuseage: rmdir dirName\n"
+            << "\t\tusage: rmdir dirName\n"
             << "\trm: remove a file;\n"
-            << "\t\tuseage: rm fileName\n"
+            << "\t\tusage: rm fileName\n"
             << "\tcd: change current path;\n"
-            << "\t\tuseage: cd pathName\n"
+            << "\t\tusage: cd pathName\n"
             << "\tcat: concatenate and print file;\n"
-            << "\t\tuseage: cat fileName [another fileName]\n"
+            << "\t\tusage: cat fileName [another fileName]\n"
             << "\techo: write arguments to the standard output or a file;\n"
-            << "\t\tuseage: echo string [fileName]\n"
+            << "\t\tusage: echo string [fileName]\n"
             << "\tfind: walk a file hierarchy;\n"
-            << "\t\tuseage: find path fileName\n"
+            << "\t\tusage: find path fileName\n"
             << "\ttree: list contents of directories in a tree-like format;\n"
-            << "\t\tuseage: tree [level(integer)]\n"
+            << "\t\tusage: tree [level(integer)]\n"
             << "\tpwd: return working directory name;\n"
-            << "\t\tuseage: pwd\n"
+            << "\t\tusage: pwd\n"
             << "\texit: exit Fat File System.\n"
-            << "\t\tuseage: exit\n";
+            << "\t\tusage: exit\n";
 }

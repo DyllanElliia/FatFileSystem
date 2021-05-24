@@ -5,7 +5,6 @@
 class User {
  public:
   User() = default;
-  ~User();
 
   // input dirName
   void mkdir(string dirName);
@@ -49,6 +48,8 @@ class User {
 
   // input string, split char
   std::list<string> split(string str);
+
+  FileSystem& getFs();
 
  private:
   FileSystem fs;
