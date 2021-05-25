@@ -50,4 +50,5 @@ public:
 	Offset findFat1Block(S_type type, string name);
 	bool cleanBlock(Offset o);
 	bool cleanFatBlock(Offset o);
+	bool Exit();
 };

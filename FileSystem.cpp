@@ -5,6 +5,14 @@
 FileSystem::FileSystem() {}
 FileSystem::~FileSystem() {}
 
+bool FileSystem::fsExit() {
+	if (file_opt.Exit()) {
+		exit(EXIT_SUCCESS);
+		return true;
+	}
+	return false;
+}
+
 bool FileSystem::PathSpliter(string path, const char split,
 							 std::list<string>& result) {
 	std::istringstream iss(path);		// 输入流

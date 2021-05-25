@@ -18,6 +18,16 @@ FileOptor::FileOptor() {
 
 		f.open("./FAT_DATA", std::ios::in | std::ios::out | std::ios::binary);
 		std::cout << "-----------Initializing FAT_DATA-----------" << std::endl;
+		// std::cout << f.tellg() << " " << f.tellp() << std::endl;
+		move2offset_short(0);
+		int* buf = new int[(HEAD_SIZE + FAT1_SIZE + FAT2_SIZE + BLOCK_NUM * BLOCK_SIZE)];
+		memset(buf, 0, (HEAD_SIZE + FAT1_SIZE + FAT2_SIZE + BLOCK_NUM * BLOCK_SIZE) * sizeof(int));
+		f.write((char*)buf, (HEAD_SIZE + FAT1_SIZE + FAT2_SIZE + BLOCK_NUM * BLOCK_SIZE) * sizeof(char));
+		std::cout << f.tellg() << " " << f.tellp() << std::endl;
+		f.seekp(0, std::ios::beg);
+		f.seekg(0, std::ios::beg);
+		delete[] buf;
+
 		struct head_data head_save;
 		strcpy(head_save.systemName, "FAT-Based System");
 		strcpy(head_save.producerName, "Dyllan & Taka");
@@ -25,14 +35,7 @@ FileOptor::FileOptor() {
 		head_save.emptyFatBlockNumber = FAT_BLOCK_NUM;
 		head_save.emptyBlockNumber = BLOCK_NUM;
 		f.write((char*)&head_save, sizeof(struct head_data));
-		// std::cout << f.tellg() << " " << f.tellp() << std::endl;
-		int* buf = new int[(FAT1_SIZE + FAT2_SIZE + BLOCK_NUM * BLOCK_SIZE) * 2];
-		memset(buf, 0, sizeof(FAT1_SIZE + FAT2_SIZE + BLOCK_NUM * BLOCK_SIZE) * sizeof(int) * 2);
-		f.write((char*)buf, (FAT1_SIZE + FAT2_SIZE + BLOCK_NUM * BLOCK_SIZE) * sizeof(char) * 2);
-		std::cout << f.tellg() << " " << f.tellp() << std::endl;
-		f.seekp(0, std::ios::beg);
-		f.seekg(0, std::ios::beg);
-		delete[] buf;
+		move2offset_short(0);
 	}
 	// std::cout << f.tellg() << " " << f.tellp() << std::endl;
 	std::cout << "----------------System Data----------------" << std::endl;
@@ -55,6 +58,16 @@ FileOptor::~FileOptor() {
 	// std::cout << f.tellg() << " " << f.tellp() << std::endl;
 	f.close();
 	std::cout << "----------------System Exit----------------" << std::endl;
+}
+
+bool FileOptor::Exit() {
+	f.seekp(0, std::ios::beg);
+	f.seekg(0, std::ios::beg);
+	f.write((char*)&HeadData_, sizeof(struct head_data));
+	// std::cout << f.tellg() << " " << f.tellp() << std::endl;
+	f.close();
+	std::cout << "----------------System Exit----------------" << std::endl;
+	return true;
 }
 
 inline Offset FileOptor::Fat1BlockBegin() {
@@ -115,14 +128,15 @@ Offset FileOptor::findEmptyBlock(int times) {
 			} else {
 				blockOffset += BLOCK_SIZE * i;
 				lastFindResult = true;
+				HeadData_.emptyBlockNumber--;
 				// std::cout << "find" << std::endl;
 				break;
 			}
 		}
 	}
 	move2offset_short(f_offset);
-	if (lastFindResult)
-		HeadData_.emptyBlockNumber--;
+	// if (lastFindResult)
+	// 	HeadData_.emptyBlockNumber--;
 	return blockOffset;
 }
 Offset FileOptor::findEmptyFatBlock() {
@@ -138,13 +152,14 @@ Offset FileOptor::findEmptyFatBlock() {
 		if (((DirData*)blockData)->st.dev == 0) {
 			blockOffset += BLOCK_SIZE * i;
 			lastFindResult = true;
+			HeadData_.emptyFatBlockNumber--;
 			// std::cout << "find" << std::endl;
 			break;
 		}
 	}
 	move2offset_short(f_offset);
-	if (lastFindResult)
-		HeadData_.emptyFatBlockNumber--;
+	// if (lastFindResult)
+	// 	HeadData_.emptyFatBlockNumber--;
 
 	return blockOffset;
 }
