@@ -75,6 +75,11 @@ std::list<string> Console::split(string str) {
       ++i;
     }
   }
+  if (quo == true) {
+    std::cout << "there is a single quote, please check your input."
+              << std::endl;
+    v.clear();
+  }
   return v;
 }
 
@@ -85,14 +90,10 @@ void Console::execFailed(string execName) {
 
 void Console::exec(string con, Console& console) {
   std::list<string> control = Console::split(con);
+  if (control.empty()) {
+    return;
+  }
   string j = *control.begin();
-  // if (i->empty()) {
-  //   control.pop_front();
-  //   i = control.begin();
-  // }
-  // for (auto&& j : control) {
-  //   std::cout << j << std::endl;
-  // }
   control.pop_front();
   if (j == "ls" || j == "exit" || j == "pwd") {
     if (!control.empty()) {
@@ -115,6 +116,7 @@ void Console::exec(string con, Console& console) {
         (user->*(console.fi[j]))(std::stoi(*control.begin()));
         // std::cout << "exec i over;\n";
       } else {
+        std::cout << j << std::endl;
         (user->*(console.f1[j]))(*control.begin());
         // std::cout << "exec 1 over;\n";
       }

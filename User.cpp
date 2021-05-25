@@ -120,7 +120,7 @@ void User::ls() {
     }
     Stat stat;
     if (!fs.fstat(fd, &stat)) {
-      std::cout << "ls: Cannot stat " << name << std::endl;
+      std::cout << "ls: Cannot stat file/dir " << name << std::endl;
       fs.close(fd);
       continue;
     }
@@ -150,6 +150,14 @@ void User::cat(string fileName) {
   F_D fd = fs.open(file);
   if (fd == -1) {
     std::cout << "cat: Cannot open file " << file << std::endl;
+    return;
+  }
+  Stat stat;
+  if (!fs.fstat(fd, &stat)) {
+    std::cout << "cat: Cannot stat file " << file << std::endl;
+  }
+  if (stat.type == T_dir) {
+    std::cout << "cat: " << file << " is a directory." << std::endl;
     return;
   }
   string buf;
@@ -193,7 +201,6 @@ void User::cat(string inFileName, string outFileName) {
 
 void User::echo(string data) { fs.write(1, data); }
 void User::echo(string data, string filePathName) {
-  std::cout << 1 << std::endl;
   string filePath = this->fmtName(filePathName);
   F_D fd = fs.open(filePath);
   if (fd > 0) {
