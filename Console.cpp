@@ -31,7 +31,7 @@ void Console::run() {
   for (;;) {
     string con = fs.getDirName();
     std::cout << "[" << con << "]"
-              << "# ";
+              << " # ";
     std::getline(std::cin, con);
     if (con == "usage") {
       this->usage();
@@ -85,7 +85,7 @@ void Console::execFailed(string execName) {
 
 void Console::exec(string con, Console& console) {
   std::list<string> control = Console::split(con);
-  auto&& i = control.begin();
+  string j = *control.begin();
   // if (i->empty()) {
   //   control.pop_front();
   //   i = control.begin();
@@ -94,40 +94,41 @@ void Console::exec(string con, Console& console) {
   //   std::cout << j << std::endl;
   // }
   control.pop_front();
-  if (*i == "ls" || *i == "exit" || *i == "pwd") {
+  if (j == "ls" || j == "exit" || j == "pwd") {
     if (!control.empty()) {
-      execFailed(*i);
+      execFailed(j);
       return;
     }
-    (user->*(console.f0[*i]))();
+    (user->*(console.f0[j]))();
     // std::cout << "exec 0 over;\n";
   } else {
     if (control.empty() || control.size() > 2) {
-      execFailed(*i);
+      execFailed(j);
       return;
     }
     if (control.size() == 1) {
-      if (!console.f1.count(*i) && !console.fi.count(*i)) {
-        execFailed(*i);
+      if (!console.f1.count(j) && !console.fi.count(j)) {
+        execFailed(j);
         return;
       }
-      if (*i == "tree") {
-        (user->*(console.fi[*i]))(std::stoi(*control.begin()));
+      if (j == "tree") {
+        (user->*(console.fi[j]))(std::stoi(*control.begin()));
         // std::cout << "exec i over;\n";
       } else {
-        (user->*(console.f1[*i]))(*control.begin());
+        (user->*(console.f1[j]))(*control.begin());
         // std::cout << "exec 1 over;\n";
       }
     } else if (control.size() == 2) {
-      if (!console.f2.count(*i)) {
-        execFailed(*i);
+      if (!console.f2.count(j)) {
+        execFailed(j);
         return;
       }
       string para1 = *control.begin();
       control.pop_front();
       string para2 = *control.begin();
       // std::cout << para1.size() << "\t" << para2.size() << std::endl;
-      (user->*(console.f2[*i]))(para1, para2);
+      std::cout << j << std::endl;
+      (user->*(console.f2[j]))(para1, para2);
       // std::cout << "exec 2 over;\n";
     }
   }

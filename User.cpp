@@ -256,26 +256,40 @@ void User::tree(int level) {
     }
     if (i->type == T_dir && level != 1) {
       cd(i->name);
-      tree(level - 1, 1);
+      if (i != --nl.nameL.end()) {
+        tree(level - 1, 1);
+      } else {
+        tree(level - 1, 1, true);
+      }
       cd(current);
     }
   }
 }
-void User::tree(int level, int currentLevel) {
+void User::tree(int level, int currentLevel, bool final) {
   string current = fs.getDirName();
   nameList nl = fs.getName();
   for (auto i = nl.nameL.begin(); i != nl.nameL.end(); ++i) {
-    for (int i = 0; i < currentLevel; ++i) {
-      std::cout << "│  ";
+    if (!final) {
+      for (int i = 0; i < currentLevel; ++i) {
+        std::cout << "│   ";
+      }
+    } else {
+      for (int i = 0; i < currentLevel; ++i) {
+        std::cout << "    ";
+      }
     }
     if (i != --nl.nameL.end()) {
-      std::cout << " ├── " << i->name << std::endl;
+      std::cout << "├── " << i->name << std::endl;
     } else {
-      std::cout << " └── " << i->name << std::endl;
+      std::cout << "└── " << i->name << std::endl;
     }
     if (i->type == T_dir && level != 1) {
       cd(i->name);
-      tree(level - 1, currentLevel + 1);
+      if (i != --nl.nameL.end()) {
+        tree(level - 1, currentLevel + 1);
+      } else {
+        tree(level - 1, currentLevel + 1, true);
+      }
       cd(current);
     }
   }

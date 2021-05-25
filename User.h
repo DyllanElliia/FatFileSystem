@@ -55,7 +55,7 @@ class User {
  private:
   FileSystem fs;
   // input tree level, current level
-  void tree(int level, int currentLevel);
+  void tree(int level, int currentLevel, bool final = false);
 };
 typedef void (User::*func_ptr_0)();
 typedef void (User::*func_ptr_str)(string);
