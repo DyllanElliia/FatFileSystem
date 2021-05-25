@@ -749,7 +749,7 @@ bool FileSystem::deleteFile(const string DirName) {
 // Output:    Write_Return
 W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 	if (fd == 1) {
-		// ignore::cout << data.substr(0, len) << std::endl;
+		std::cout << data.substr(0, len) << std::endl;
 		return len;
 	}
 	W_RET w_len = 0;
