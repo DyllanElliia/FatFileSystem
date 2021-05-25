@@ -162,7 +162,6 @@ void User::cat(string fileName) {
   }
   string buf;
   int len = fs.read(fd, buf);
-  std::cout << buf << std::endl;
   fs.write(1, buf, len);
   fs.close(fd);
 }

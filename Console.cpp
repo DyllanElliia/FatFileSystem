@@ -116,7 +116,6 @@ void Console::exec(string con, Console& console) {
         (user->*(console.fi[j]))(std::stoi(*control.begin()));
         // std::cout << "exec i over;\n";
       } else {
-        std::cout << j << std::endl;
         (user->*(console.f1[j]))(*control.begin());
         // std::cout << "exec 1 over;\n";
       }
