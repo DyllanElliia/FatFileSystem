@@ -35,14 +35,14 @@ Offset FileSystem::findDirSonDir(Offset off_begin, string name) {
 	file_opt.move2offset_short(off_begin);
 	Dir lastDir;
 	if (!file_opt.readData(lastDir.getDataCharPtr(), lastDir.getDataSize())) {
-		std::cout << "read data failed. Path: " << name << std::endl;
+		// ignore::cout << "read data failed. Path: " << name << std::endl;
 		return 0;
 	}
 	Offset dir_begin = lastDir.getSonDirHead();
 	if (dir_begin == 0)
 		return 0;
 	if (dir_begin < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-		std::cout << "error path. " << name << " can not be found." << std::endl;
+		// ignore::cout << "error path. " << name << " can not be found." << std::endl;
 		return 0;
 	}
 	dir_off = dir_begin;
@@ -51,11 +51,11 @@ Offset FileSystem::findDirSonDir(Offset off_begin, string name) {
 		Dir blockData;
 		if (!file_opt.readData(blockData.getDataCharPtr(),
 							   blockData.getDataSize())) {
-			std::cout << "read data failed. Path: " << name << std::endl;
+			// ignore::cout << "read data failed. Path: " << name << std::endl;
 			return 0;
 		}
 		if (blockData.getStat().dev != dir_off) {
-			std::cout << "Block data errow! path: " << name << std::endl;
+			// ignore::cout << "Block data errow! path: " << name << std::endl;
 			return 0;
 		}
 		if (name.compare(blockData.getName()) == 0) {
@@ -71,14 +71,14 @@ Offset FileSystem::findDirSonFile(Offset off_begin, string name) {
 	file_opt.move2offset_short(off_begin);
 	Dir lastDir;
 	if (!file_opt.readData(lastDir.getDataCharPtr(), lastDir.getDataSize())) {
-		std::cout << "read data failed. Path: " << name << std::endl;
+		// ignore::cout << "read data failed. Path: " << name << std::endl;
 		return 0;
 	}
 	Offset dir_begin = lastDir.getSonFileHead();
 	if (dir_begin == 0)
 		return 0;
 	if (dir_begin < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-		std::cout << "error path. " << name << " can not be found." << std::endl;
+		// ignore::cout << "error path. " << name << " can not be found." << std::endl;
 		return 0;
 	}
 	dir_off = dir_begin;
@@ -87,11 +87,11 @@ Offset FileSystem::findDirSonFile(Offset off_begin, string name) {
 		File blockData;
 		if (!file_opt.readData(blockData.getDataCharPtr(),
 							   blockData.getDataSize())) {
-			std::cout << "read data failed. Path: " << name << std::endl;
+			// ignore::cout << "read data failed. Path: " << name << std::endl;
 			return 0;
 		}
 		if (blockData.getStat().dev != dir_off) {
-			std::cout << "Block data errow! path: " << name << std::endl;
+			// ignore::cout << "Block data errow! path: " << name << std::endl;
 			return 0;
 		}
 		if (name.compare(blockData.getName()) == 0) {
@@ -111,15 +111,14 @@ Offset FileSystem::findLongPath(Offset off_begin, std::list<string>& pathList) {
 		file_opt.move2offset_short(lastDir_offset);
 		Dir lastDir;
 		if (!file_opt.readData(lastDir.getDataCharPtr(), lastDir.getDataSize())) {
-			std::cout << "read data failed. Path: " << path_name << std::endl;
+			// ignore::cout << "read data failed. Path: " << path_name << std::endl;
 			return 0;
 		}
 		Offset dir_begin = lastDir.getSonDirHead();
 		if (dir_begin == 0)
 			return 0;
 		if (dir_begin < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-			std::cout << "error path. " << path_name << " can not be found."
-					  << std::endl;
+			// ignore::cout << "error path. " << path_name << " can not be found." << std::endl;
 			return 0;
 		}
 		dir_off = dir_begin;
@@ -128,11 +127,11 @@ Offset FileSystem::findLongPath(Offset off_begin, std::list<string>& pathList) {
 			Dir blockData;
 			if (!file_opt.readData(blockData.getDataCharPtr(),
 								   blockData.getDataSize())) {
-				std::cout << "read data failed. Path: " << path_name << std::endl;
+				// ignore::cout << "read data failed. Path: " << path_name << std::endl;
 				return 0;
 			}
 			if (blockData.getStat().dev != dir_off) {
-				std::cout << "Block data errow! path: " << path_name << std::endl;
+				// ignore::cout << "Block data errow! path: " << path_name << std::endl;
 				return 0;
 			}
 			if (path_name.compare(blockData.getName()) == 0) {
@@ -155,7 +154,7 @@ F_D FileSystem::open(const string PathName) {
 	PathSpliter(PathName, '/', pathList);
 	Block* pathB = nullptr;
 	if (pathList.size() == 0) {
-		std::cout << "path is empty!" << std::endl;
+		// ignore::cout << "path is empty!" << std::endl;
 		return -1;
 	}
 	if (pathList.size() == 1) {
@@ -164,7 +163,7 @@ F_D FileSystem::open(const string PathName) {
 		if (!file_opt.getLastFindBool()) {
 			fat_offset = file_opt.findFat1Block(T_dir, pathList.front());
 			if (!file_opt.getLastFindBool()) {
-				std::cout << pathList.front() << " not found!" << std::endl;
+				// ignore::cout << pathList.front() << " not found!" << std::endl;
 				return -1;
 			}
 		}
@@ -172,7 +171,7 @@ F_D FileSystem::open(const string PathName) {
 		if (fdBuf.set(fd, fat_offset))
 			return fd;
 		else {
-			std::cout << PathName << " has been opened!" << std::endl;
+			// ignore::cout << PathName << " has been opened!" << std::endl;
 			return -1;
 		}
 	}
@@ -180,20 +179,20 @@ F_D FileSystem::open(const string PathName) {
 	// FAT1
 	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
 	if (!file_opt.getLastFindBool()) {
-		std::cout << pathList.front() << " not found" << std::endl;
+		// ignore::cout << pathList.front() << " not found" << std::endl;
 		return -1;
 	}
 	pathList.pop_front();
 	string back_name = pathList.back();
 	pathList.pop_back();
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
-	// std::cout << "dir: " << dir_off << std::endl;
+	// test::cout << "dir: " << dir_off << std::endl;
 	if (dir_off >= HEAD_SIZE) {
 		Offset fd_off = findDirSonFile(dir_off, back_name);
 		if (fd_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
 			fd_off = findDirSonDir(dir_off, back_name);
 			if (fd_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-				std::cout << PathName << " not found!" << std::endl;
+				// ignore::cout << PathName << " not found!" << std::endl;
 				return -1;
 			}
 		}
@@ -201,11 +200,11 @@ F_D FileSystem::open(const string PathName) {
 		if (fd && fdBuf.set(fd, fd_off))
 			return fd;
 		else {
-			std::cout << PathName << " has been opened!" << std::endl;
+			// ignore::cout << PathName << " has been opened!" << std::endl;
 			return -1;
 		}
 	}
-	std::cout << PathName << ": open file failed." << std::endl;
+	// ignore::cout << PathName << ": open file failed." << std::endl;
 	return -1;
 }
 
@@ -228,13 +227,13 @@ bool FileSystem::fstat(const F_D fd, const Stat* st) {
 	Offset off = fdBuf.getOff(fd);
 	if (off >= HEAD_SIZE) {
 		if (!st) {
-			std::cout << "stat_ptr must be new a space!" << std::endl;
+			// ignore::cout << "stat_ptr must be new a space!" << std::endl;
 			return false;
 		}
 		file_opt.move2offset_short(off);
 		file_opt.readData((char*)st, sizeof(Stat));
 		if (st->dev != off) {
-			std::cout << "error, the F_D you input is damaged!" << std::endl;
+			// ignore::cout << "error, the F_D you input is damaged!" << std::endl;
 			return false;
 		}
 		return true;
@@ -250,19 +249,19 @@ bool FileSystem::createDir(const string DirName) {
 	PathSpliter(DirName, '/', pathList);
 	Block* pathB = nullptr;
 	if (pathList.size() == 0) {
-		std::cout << "path is empty!" << std::endl;
+		// ignore::cout << "path is empty!" << std::endl;
 		return false;
 	}
 	if (pathList.size() == 1) {
 		// create Dir in Fat1 AND Fat2
 		Offset fat_offset = file_opt.findFat1Block(T_dir, pathList.front());
 		if (file_opt.getLastFindBool()) {
-			std::cout << pathList.front() << " already exists!" << std::endl;
+			// ignore::cout << pathList.front() << " already exists!" << std::endl;
 			return false;
 		}
 		fat_offset = file_opt.findEmptyFatBlock();
 		if (!file_opt.getLastFindBool()) {
-			std::cout << "failed to find empty fat block!" << std::endl;
+			// ignore::cout << "failed to find empty fat block!" << std::endl;
 			return false;
 		}
 		Stat st;
@@ -273,7 +272,7 @@ bool FileSystem::createDir(const string DirName) {
 		fat.setStat(st);
 		fat.changeFatherOff(fat_offset);
 		fat.setName(pathList.front());
-		// std::cout << fat.getStat().dev << " of: " << fat_offset << std::endl;
+		// test::cout << fat.getStat().dev << " of: " << fat_offset << std::endl;
 		file_opt.move2offset_short(fat_offset);
 		file_opt.saveData(fat.getDataCharPtr(), fat.getDataSize());
 
@@ -290,23 +289,23 @@ bool FileSystem::createDir(const string DirName) {
 	// FAT1
 	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
 	if (!file_opt.getLastFindBool()) {
-		std::cout << pathList.front() << " not found" << std::endl;
+		// ignore::cout << pathList.front() << " not found" << std::endl;
 		return false;
 	}
 	pathList.pop_front();
 	string back_name = pathList.back();
 	pathList.pop_back();
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
-	// std::cout << "dir: " << dir_off << std::endl;
+	// test::cout << "dir: " << dir_off << std::endl;
 	if (dir_off >= HEAD_SIZE) {
 		if (findDirSonDir(dir_off, back_name) >=
 			HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-			std::cout << DirName << " already exists!" << std::endl;
+			// ignore::cout << DirName << " already exists!" << std::endl;
 			return false;
 		}
 		Offset newOff = file_opt.findEmptyBlock();
 		if (!file_opt.getLastFindBool()) {
-			std::cout << "find Empty Block failed." << std::endl;
+			// ignore::cout << "find Empty Block failed." << std::endl;
 			return false;
 		}
 		Dir newDir;
@@ -328,7 +327,7 @@ bool FileSystem::createDir(const string DirName) {
 		file_opt.saveData(newDir.getDataCharPtr(), newDir.getDataSize());
 		return true;
 	}
-	std::cout << DirName << ": create dir failed." << std::endl;
+	// ignore::cout << DirName << ": create dir failed." << std::endl;
 	return false;
 }
 
@@ -340,14 +339,14 @@ bool FileSystem::deleteDir(const string DirName) {
 	PathSpliter(DirName, '/', pathList);
 	Block* pathB = nullptr;
 	if (pathList.size() == 0) {
-		std::cout << "path is empty!" << std::endl;
+		// ignore::cout << "path is empty!" << std::endl;
 		return false;
 	}
 	if (pathList.size() == 1) {
 		// create Dir in Fat1 AND Fat2
 		Offset fat_offset = file_opt.findFat1Block(T_dir, pathList.front());
 		if (!file_opt.getLastFindBool()) {
-			std::cout << pathList.front() << " not found!" << std::endl;
+			// ignore::cout << pathList.front() << " not found!" << std::endl;
 			return false;
 		}
 		// delete
@@ -364,8 +363,8 @@ bool FileSystem::deleteDir(const string DirName) {
 			case T_file:
 				deleteFile(newPath);
 				break;
-			default:
-				std::cout << "error not path " << newPath << std::endl;
+				// default:
+				// ignore::cout << "error not path " << newPath << std::endl;
 			}
 		}
 
@@ -376,14 +375,14 @@ bool FileSystem::deleteDir(const string DirName) {
 	// FAT1
 	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
 	if (!file_opt.getLastFindBool()) {
-		std::cout << pathList.front() << " not found" << std::endl;
+		// ignore::cout << pathList.front() << " not found" << std::endl;
 		return false;
 	}
 	pathList.pop_front();
 	string back_name = pathList.back();
 	pathList.pop_back();
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
-	// std::cout << "dir: " << dir_off << std::endl;
+	// test::cout << "dir: " << dir_off << std::endl;
 	if (dir_off >= HEAD_SIZE) {
 		Offset DirHere = findDirSonDir(dir_off, back_name);
 		if (DirHere >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
@@ -400,8 +399,8 @@ bool FileSystem::deleteDir(const string DirName) {
 				case T_file:
 					deleteFile(newPath);
 					break;
-				default:
-					std::cout << "error not path " << newPath << std::endl;
+					// default:
+					// ignore::cout << "error not path " << newPath << std::endl;
 				}
 			}
 			// chang link
@@ -435,10 +434,10 @@ bool FileSystem::deleteDir(const string DirName) {
 			file_opt.cleanBlock(DirHere);
 			return true;
 		}
-		std::cout << "failed to find " << back_name << std::endl;
+		// ignore::cout << "failed to find " << back_name << std::endl;
 		return false;
 	}
-	std::cout << DirName << ": delete dir failed." << std::endl;
+	// ignore::cout << DirName << ": delete dir failed." << std::endl;
 	return false;
 }
 
@@ -455,7 +454,7 @@ bool FileSystem::openDir(const string cdPath) {
 	if (pathList.size() == 1) {
 		Offset fat_off = file_opt.findFat1Block(T_dir, pathList.front());
 		if (!file_opt.getLastFindBool()) {
-			std::cout << "failed to find " << cdPath << std::endl;
+			// ignore::cout << "failed to find " << cdPath << std::endl;
 			return false;
 		}
 		nowDir_off = fat_off;
@@ -465,13 +464,13 @@ bool FileSystem::openDir(const string cdPath) {
 	// FAT1
 	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
 	if (!file_opt.getLastFindBool()) {
-		std::cout << pathList.front() << " not found" << std::endl;
+		// ignore::cout << pathList.front() << " not found" << std::endl;
 		return false;
 	}
 	pathList.pop_front();
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
 	if (dir_off < HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-		std::cout << "failed to find " << cdPath << std::endl;
+		// ignore::cout << "failed to find " << cdPath << std::endl;
 		return false;
 	}
 	nowDir_off = dir_off;
@@ -512,7 +511,7 @@ nameList FileSystem::getName() {
 			file_opt.move2offset_short(fat_off + i * BLOCK_SIZE);
 			char blockData[BLOCK_SIZE];
 			file_opt.readData(blockData, BLOCK_SIZE);
-			// std::cout << string(((DirData*)blockData)->name) << std::endl;
+			// test::cout << string(((DirData*)blockData)->name) << std::endl;
 			switch (((DirData*)blockData)->st.type) {
 			case T_dir:
 				nList.nameL.push_back({T_dir, string(((DirData*)blockData)->name)});
@@ -556,19 +555,19 @@ bool FileSystem::createFile(const string DirName) {
 	PathSpliter(DirName, '/', pathList);
 	Block* pathB = nullptr;
 	if (pathList.size() == 0) {
-		std::cout << "path is empty!" << std::endl;
+		// ignore::cout << "path is empty!" << std::endl;
 		return false;
 	}
 	if (pathList.size() == 1) {
 		// create File in Fat1 AND Fat2
 		Offset fat_offset = file_opt.findFat1Block(T_file, pathList.front());
 		if (file_opt.getLastFindBool()) {
-			std::cout << pathList.front() << " already exists!" << std::endl;
+			// ignore::cout << pathList.front() << " already exists!" << std::endl;
 			return false;
 		}
 		fat_offset = file_opt.findEmptyFatBlock();
 		if (!file_opt.getLastFindBool()) {
-			std::cout << "failed to find empty fat block!" << std::endl;
+			// ignore::cout << "failed to find empty fat block!" << std::endl;
 			return false;
 		}
 		Stat st;
@@ -579,7 +578,7 @@ bool FileSystem::createFile(const string DirName) {
 		fat.setStat(st);
 		fat.changeFatherOff(fat_offset);
 		fat.setName(pathList.front());
-		// std::cout << fat.getStat().dev << " of: " << fat_offset << std::endl;
+		// test::cout << fat.getStat().dev << " of: " << fat_offset << std::endl;
 		file_opt.move2offset_short(fat_offset);
 		file_opt.saveData(fat.getDataCharPtr(), fat.getDataSize());
 
@@ -596,23 +595,23 @@ bool FileSystem::createFile(const string DirName) {
 	// FAT1
 	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
 	if (!file_opt.getLastFindBool()) {
-		std::cout << pathList.front() << " not found" << std::endl;
+		// ignore::cout << pathList.front() << " not found" << std::endl;
 		return false;
 	}
 	pathList.pop_front();
 	string back_name = pathList.back();
 	pathList.pop_back();
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
-	// std::cout << "dir: " << dir_off << std::endl;
+	// test::cout << "dir: " << dir_off << std::endl;
 	if (dir_off >= HEAD_SIZE) {
 		if (findDirSonFile(dir_off, back_name) >=
 			HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-			std::cout << DirName << " already exists!" << std::endl;
+			// ignore::cout << DirName << " already exists!" << std::endl;
 			return false;
 		}
 		Offset newOff = file_opt.findEmptyBlock();
 		if (!file_opt.getLastFindBool()) {
-			std::cout << "find Empty Block failed." << std::endl;
+			// ignore::cout << "find Empty Block failed." << std::endl;
 			return false;
 		}
 		File newFile;
@@ -634,7 +633,7 @@ bool FileSystem::createFile(const string DirName) {
 		file_opt.saveData(newFile.getDataCharPtr(), newFile.getDataSize());
 		return true;
 	}
-	std::cout << DirName << ": create file failed." << std::endl;
+	// ignore::cout << DirName << ": create file failed." << std::endl;
 	return false;
 }
 
@@ -658,14 +657,14 @@ bool FileSystem::deleteFile(const string DirName) {
 	PathSpliter(DirName, '/', pathList);
 	Block* pathB = nullptr;
 	if (pathList.size() == 0) {
-		std::cout << "path is empty!" << std::endl;
+		// ignore::cout << "path is empty!" << std::endl;
 		return false;
 	}
 	if (pathList.size() == 1) {
 		// create Dir in Fat1 AND Fat2
 		Offset fat_offset = file_opt.findFat1Block(T_file, pathList.front());
 		if (!file_opt.getLastFindBool()) {
-			std::cout << pathList.front() << " not found!" << std::endl;
+			// ignore::cout << pathList.front() << " not found!" << std::endl;
 			return false;
 		}
 		// delete
@@ -673,7 +672,7 @@ bool FileSystem::deleteFile(const string DirName) {
 		file_opt.move2offset_short(fat_offset);
 		file_opt.readData(file_d.getDataCharPtr(), file_d.getDataSize());
 		if (!cleanFileData(file_d.getFileData())) {
-			std::cout << "clean file failed!" << std::endl;
+			// ignore::cout << "clean file failed!" << std::endl;
 			return false;
 		}
 		file_opt.cleanFatBlock(fat_offset);
@@ -683,14 +682,14 @@ bool FileSystem::deleteFile(const string DirName) {
 	// FAT1
 	Offset Fat1_offset = file_opt.findFat1Block(T_dir, pathList.front());
 	if (!file_opt.getLastFindBool()) {
-		std::cout << pathList.front() << " not found" << std::endl;
+		// ignore::cout << pathList.front() << " not found" << std::endl;
 		return false;
 	}
 	pathList.pop_front();
 	string back_name = pathList.back();
 	pathList.pop_back();
 	Offset dir_off = findLongPath(Fat1_offset, pathList);
-	// std::cout << "dir: " << dir_off << std::endl;
+	// test::cout << "dir: " << dir_off << std::endl;
 	if (dir_off >= HEAD_SIZE) {
 		Offset FileHere = findDirSonFile(dir_off, back_name);
 		if (FileHere >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
@@ -699,7 +698,7 @@ bool FileSystem::deleteFile(const string DirName) {
 			file_opt.move2offset_short(FileHere);
 			file_opt.readData(file_d.getDataCharPtr(), file_d.getDataSize());
 			if (!cleanFileData(file_d.getFileData())) {
-				std::cout << "clean file failed!" << std::endl;
+				// ignore::cout << "clean file failed!" << std::endl;
 				return false;
 			}
 
@@ -736,10 +735,10 @@ bool FileSystem::deleteFile(const string DirName) {
 			file_opt.cleanBlock(FileHere);
 			return true;
 		}
-		std::cout << "failed to find " << back_name << std::endl;
+		// ignore::cout << "failed to find " << back_name << std::endl;
 		return false;
 	}
-	std::cout << DirName << ": delete dir failed." << std::endl;
+	// ignore::cout << DirName << ": delete dir failed." << std::endl;
 	return false;
 }
 
@@ -750,20 +749,20 @@ bool FileSystem::deleteFile(const string DirName) {
 // Output:    Write_Return
 W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 	if (fd == 1) {
-		std::cout << data.substr(0, len) << std::endl;
+		// ignore::cout << data.substr(0, len) << std::endl;
 		return len;
 	}
 	W_RET w_len = 0;
-	// std::cout << w_len << " " << len << std::endl;
+	// test::cout << w_len << " " << len << std::endl;
 	Offset file_off = fdBuf.getOff(fd);
 	if (file_off < HEAD_SIZE) {
-		std::cout << "Please open the file before you write." << std::endl;
+		// ignore::cout << "Please open the file before you write." << std::endl;
 		return w_len;
 	}
 	if (len == -1 && len > data.size())
 		len = data.size();
 	if (len < 0) {
-		std::cout << "len must >= 0" << std::endl;
+		// ignore::cout << "len must >= 0" << std::endl;
 		return w_len;
 	}
 
@@ -774,7 +773,7 @@ W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 	fileContent_off = file_data.getFileData();
 
 	if (!cleanFileData(fileContent_off)) {
-		std::cout << "failed to clean file!" << std::endl;
+		// ignore::cout << "failed to clean file!" << std::endl;
 		return w_len;
 	}
 
@@ -790,7 +789,7 @@ W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 	FileContent file_c;
 	fileC_off_now = file_opt.findEmptyBlock();
 	if (!file_opt.getLastFindBool()) {
-		std::cout << "failed to find first block!" << std::endl;
+		// ignore::cout << "failed to find first block!" << std::endl;
 		return w_len;
 	}
 	fileC_off_begin = fileC_off_now;
@@ -803,13 +802,13 @@ W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 	data.push_back(' ');
 	for (auto i : data) {
 		if (count == F_DATA_LEN_LIMIT) {
-			// std::cout << fileC_off_now << std::endl;
+			// test::cout << fileC_off_now << std::endl;
 			st.size = count;
 			file_c.setStat(st);
 			Offset save_now = fileC_off_now;
 			fileC_off_now = file_opt.findEmptyBlock(1);
 			if (!file_opt.getLastFindBool()) {
-				std::cout << "failed to find empty block!" << std::endl;
+				// ignore::cout << "failed to find empty block!" << std::endl;
 				return w_len;
 			}
 			file_c.changeBrother(fileC_off_now);
@@ -819,10 +818,10 @@ W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 			st.dev = fileC_off_now;
 		}
 		if (len == 0) {
-			// std::cout << fileC_off_now << std::endl;
+			// test::cout << fileC_off_now << std::endl;
 			st.size = count;
 			file_c.setStat(st);
-			std::cout << file_c.getStat().size << std::endl;
+			// ignore::cout << file_c.getStat().size << std::endl;
 			file_opt.move2offset_short(fileC_off_now);
 			file_c.changeBrother(0);
 			file_opt.saveData(file_c.getDataCharPtr(), file_c.getDataSize());
@@ -832,7 +831,7 @@ W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 		len--;
 		w_len++;
 	}
-	// std::cout << fileC_off_begin << std::endl;
+	// test::cout << fileC_off_begin << std::endl;
 	file_data.changeFileData(fileC_off_begin);
 	file_opt.move2offset_short(file_off);
 	file_opt.saveData(file_data.getDataCharPtr(), file_data.getDataSize());
@@ -846,16 +845,16 @@ W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 // Output:    Read_Return
 R_RET FileSystem::read(const F_D fd, string& data, R_LEN len) {
 	R_RET r_len = 0;
-	// std::cout << r_len << " " << len << std::endl;
+	// test::cout << r_len << " " << len << std::endl;
 	Offset file_off = fdBuf.getOff(fd);
 	if (file_off < HEAD_SIZE) {
-		std::cout << "Please open the file before you write." << std::endl;
+		// ignore::cout << "Please open the file before you write." << std::endl;
 		return r_len;
 	}
 	if (len == -1)
 		len = 1000000007;
 	if (len < 0 && len != -1) {
-		std::cout << "len must >= 0" << std::endl;
+		// ignore::cout << "len must >= 0" << std::endl;
 		return r_len;
 	}
 
@@ -866,7 +865,7 @@ R_RET FileSystem::read(const F_D fd, string& data, R_LEN len) {
 	fileContent_off = file_data.getFileData();
 
 	while (fileContent_off >= HEAD_SIZE + FAT1_SIZE + FAT2_SIZE) {
-		// std::cout << fileContent_off << std::endl;
+		// test::cout << fileContent_off << std::endl;
 		if (r_len >= len)
 			break;
 
@@ -875,7 +874,7 @@ R_RET FileSystem::read(const F_D fd, string& data, R_LEN len) {
 		file_opt.readData(file_c.getDataCharPtr(), file_c.getDataSize());
 		// read
 		char* fc_data = file_c.getDataptr();
-		// std::cout << file_c.getStat().dev << std::endl;
+		// test::cout << file_c.getStat().dev << std::endl;
 		for (int i = 0; i < file_c.getStat().size; ++i) {
 			data.push_back(fc_data[i]);
 			r_len++;
