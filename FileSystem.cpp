@@ -1,5 +1,6 @@
 #include "FileSystem.h"
 
+#include <algorithm>
 #include <sstream>
 
 FileSystem::FileSystem() {}
@@ -521,6 +522,7 @@ nameList FileSystem::getName() {
 				break;
 			}
 		}
+		nList.nameL.sort();
 		return nList;
 	}
 
@@ -544,6 +546,7 @@ nameList FileSystem::getName() {
 		nList.nameL.push_back({T_dir, sonDir.getName()});
 		sonDir_off = sonDir.getBrotherOff();
 	}
+	nList.nameL.sort();
 	return nList;
 }
 

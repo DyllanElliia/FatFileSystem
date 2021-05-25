@@ -58,11 +58,18 @@ public:
 		struct l_data {
 			S_type type;
 			string name;
+			// bool operator<(l_data b) { return this->type > b.type ? true : (this->name < b.name); }
+			bool operator<(l_data b) {
+				if (type == b.type)
+					return this->name < b.name;
+				return type > b.type;
+			}
 		};
 		using l_data = struct l_data;
 		std::list<l_data> nameL;
 	};
 	using nameList = struct nameList;
+	using l_data = nameList::l_data;
 	// used for Dir
 	// Input:     DIR_NAME
 	// Output:    Boolen
