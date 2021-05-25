@@ -42,11 +42,39 @@ void Console::run() {
 }
 
 std::list<string> Console::split(string str) {
-  std::regex ws_re("\\s+");
-  std::list<string> v(
-      std::sregex_token_iterator(str.begin(), str.end(), ws_re, -1),
-      std::sregex_token_iterator());
+  // std::regex ws_re("\\s+");
+  // std::list<string> v(
+  //     std::sregex_token_iterator(str.begin(), str.end(), ws_re, -1),
+  //     std::sregex_token_iterator());
+  std::list<string> v;
+  string temp;
+  int size = str.size();
+  bool quo = false;
+  for (int i = 0; i < size; ++i) {
+    if (str[i] == '"' && quo == true) {
+      quo = false;
+      v.push_back(temp);
+      temp.clear();
+      continue;
+    } else if (str[i] == '"' && quo == false) {
+      quo = true;
+      continue;
+    } else if ((str[i] != '"' && quo == true) || str[i] != ' ') {
+      temp += str[i];
+    } else {
+      v.push_back(temp);
+      temp.clear();
+    }
+  }
+  v.push_back(temp);
 
+  for (auto i = v.begin(); i != v.end();) {
+    if ((*i).size() == 0) {
+      i = v.erase(i);
+    } else {
+      ++i;
+    }
+  }
   return v;
 }
 
@@ -58,10 +86,13 @@ void Console::execFailed(string execName) {
 void Console::exec(string con, Console& console) {
   std::list<string> control = Console::split(con);
   auto&& i = control.begin();
-  if (i->empty()) {
-    control.pop_front();
-    i = control.begin();
-  }
+  // if (i->empty()) {
+  //   control.pop_front();
+  //   i = control.begin();
+  // }
+  // for (auto&& j : control) {
+  //   std::cout << j << std::endl;
+  // }
   control.pop_front();
   if (*i == "ls" || *i == "exit" || *i == "pwd") {
     if (!control.empty()) {
@@ -95,6 +126,7 @@ void Console::exec(string con, Console& console) {
       string para1 = *control.begin();
       control.pop_front();
       string para2 = *control.begin();
+      // std::cout << para1.size() << "\t" << para2.size() << std::endl;
       (user->*(console.f2[*i]))(para1, para2);
       // std::cout << "exec 2 over;\n";
     }
