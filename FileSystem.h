@@ -59,11 +59,11 @@ public:
 			S_type type;
 			string name;
 			// bool operator<(l_data b) { return this->type > b.type ? true : (this->name < b.name); }
-			bool operator<(l_data b) {
-				if (type == b.type)
-					return this->name < b.name;
-				return type > b.type;
-			}
+            bool operator<(l_data b) const {
+                if (type == b.type)
+                    return name < b.name;
+                return type > b.type;
+            }
 		};
 		using l_data = struct l_data;
 		std::list<l_data> nameL;
