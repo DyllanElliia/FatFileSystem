@@ -51,22 +51,19 @@ FileOptor::FileOptor() {
 	// std::cout << f.tellg() << " " << f.tellp() << std::endl;
 }
 FileOptor::~FileOptor() {
-	// std::cout << f.tellg() << " " << f.tellp() << std::endl;
-	f.seekp(0, std::ios::beg);
-	f.seekg(0, std::ios::beg);
-	f.write((char*)&HeadData_, sizeof(struct head_data));
-	// std::cout << f.tellg() << " " << f.tellp() << std::endl;
-	f.close();
-	std::cout << "----------------System Exit----------------" << std::endl;
+	Exit();
 }
 
 bool FileOptor::Exit() {
+	saveHead();
+	f.close();
+	std::cout << "----------------System Exit----------------" << std::endl;
+	return true;
+}
+bool FileOptor::saveHead() {
 	f.seekp(0, std::ios::beg);
 	f.seekg(0, std::ios::beg);
 	f.write((char*)&HeadData_, sizeof(struct head_data));
-	// std::cout << f.tellg() << " " << f.tellp() << std::endl;
-	f.close();
-	std::cout << "----------------System Exit----------------" << std::endl;
 	return true;
 }
 

@@ -26,12 +26,12 @@ private:
 
 public:
 #define HEAD_SIZE 128
-#define FAT_BLOCK_NUM 16
-#define FAT1_SIZE 1024
-#define FAT2_SIZE 1024
+#define FAT_BLOCK_NUM 32
+#define FAT1_SIZE 2048
+#define FAT2_SIZE 2048
 #define BLOCK_SIZE 64
 #define BLOCK_SIZE_DOU 128
-#define BLOCK_NUM 128
+#define BLOCK_NUM 1024
 	FileOptor();
 	~FileOptor();
 	inline Offset Fat1BlockBegin();
@@ -50,5 +50,6 @@ public:
 	Offset findFat1Block(S_type type, string name);
 	bool cleanBlock(Offset o);
 	bool cleanFatBlock(Offset o);
+	bool saveHead();
 	bool Exit();
 };

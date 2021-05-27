@@ -33,7 +33,7 @@ public:
 	// Input:     FILE_DESCRIPTOR
 	//            Stat_ptr
 	// Output:    Boolen
-	bool fstat(const F_D fd, const Stat* st);
+	bool fstat(const F_D fd, Stat* st);
 
 	// used for Dir
 	// Input:     DIR_NAME
