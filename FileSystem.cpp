@@ -155,6 +155,9 @@ F_D FileSystem::open(const string PathName) {
 	PathSpliter(PathName, '/', pathList);
 	Block* pathB = nullptr;
 	if (pathList.size() == 0) {
+		if (PathName == "/") {
+			return 0;
+		}
 		// ignore::cout << "path is empty!" << std::endl;
 		return -1;
 	}
@@ -222,9 +225,14 @@ bool FileSystem::close(const F_D fd) {
 // Input:     FILE_DESCRIPTOR
 //            Stat_ptr
 // Output:    Boolen
-bool FileSystem::fstat(const F_D fd, const Stat* st) {
+bool FileSystem::fstat(const F_D fd, Stat* st) {
 	if (fd == -1)
 		return false;
+	if (fd == 0) {
+		st->type = T_dir;
+		st->size = st->dev = 0;
+		return true;
+	}
 	Offset off = fdBuf.getOff(fd);
 	if (off >= HEAD_SIZE) {
 		if (!st) {
@@ -284,6 +292,8 @@ bool FileSystem::createDir(const string DirName) {
 		fat.setName(pathList.front());
 		file_opt.move2offset_short(fat_offset);
 		file_opt.saveData(fat.getDataCharPtr(), fat.getDataSize());
+		file_opt.saveHead();
+
 		return true;
 	}
 	// long path
@@ -326,6 +336,8 @@ bool FileSystem::createDir(const string DirName) {
 		file_opt.saveData(fatherDir.getDataCharPtr(), fatherDir.getDataSize());
 		file_opt.move2offset_short(newOff);
 		file_opt.saveData(newDir.getDataCharPtr(), newDir.getDataSize());
+		file_opt.saveHead();
+
 		return true;
 	}
 	// ignore::cout << DirName << ": create dir failed." << std::endl;
@@ -370,6 +382,8 @@ bool FileSystem::deleteDir(const string DirName) {
 		}
 
 		file_opt.cleanFatBlock(fat_offset);
+		file_opt.saveHead();
+
 		return true;
 	}
 	// long path
@@ -433,6 +447,8 @@ bool FileSystem::deleteDir(const string DirName) {
 				}
 			}
 			file_opt.cleanBlock(DirHere);
+			file_opt.saveHead();
+
 			return true;
 		}
 		// ignore::cout << "failed to find " << back_name << std::endl;
@@ -592,6 +608,7 @@ bool FileSystem::createFile(const string DirName) {
 		fat.setName(pathList.front());
 		file_opt.move2offset_short(fat_offset);
 		file_opt.saveData(fat.getDataCharPtr(), fat.getDataSize());
+		file_opt.saveHead();
 		return true;
 	}
 	// long path
@@ -634,6 +651,7 @@ bool FileSystem::createFile(const string DirName) {
 		file_opt.saveData(fatherDir.getDataCharPtr(), fatherDir.getDataSize());
 		file_opt.move2offset_short(newOff);
 		file_opt.saveData(newFile.getDataCharPtr(), newFile.getDataSize());
+		file_opt.saveHead();
 		return true;
 	}
 	// ignore::cout << DirName << ": create file failed." << std::endl;
@@ -679,6 +697,7 @@ bool FileSystem::deleteFile(const string DirName) {
 			return false;
 		}
 		file_opt.cleanFatBlock(fat_offset);
+		file_opt.saveHead();
 		return true;
 	}
 	// long path
@@ -736,6 +755,8 @@ bool FileSystem::deleteFile(const string DirName) {
 			}
 
 			file_opt.cleanBlock(FileHere);
+			file_opt.saveHead();
+
 			return true;
 		}
 		// ignore::cout << "failed to find " << back_name << std::endl;
@@ -784,6 +805,8 @@ W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 		file_data.changeFileData(0);
 		file_opt.move2offset_short(file_off);
 		file_opt.saveData(file_data.getDataCharPtr(), file_data.getDataSize());
+		file_opt.saveHead();
+
 		return w_len;
 	}
 	file_data.changeStSize(len);
@@ -838,6 +861,8 @@ W_RET FileSystem::write(const F_D fd, string data, W_LEN len) {
 	file_data.changeFileData(fileC_off_begin);
 	file_opt.move2offset_short(file_off);
 	file_opt.saveData(file_data.getDataCharPtr(), file_data.getDataSize());
+	file_opt.saveHead();
+
 	return w_len;
 }
 
