@@ -61,7 +61,7 @@ public:
 			// bool operator<(l_data b) { return this->type > b.type ? true : (this->name < b.name); }
 			bool operator<(l_data b) {
 				if (type == b.type)
-					return this->name < b.name;
+					return name < b.name;
 				return type > b.type;
 			}
 		};
