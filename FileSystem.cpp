@@ -216,8 +216,14 @@ F_D FileSystem::open(const string PathName) {
 // Input:     FILE_DESCRIPTOR
 // Output:    Boolen
 bool FileSystem::close(const F_D fd) {
-	if (fd == -1)
+	if (fd == -1 || !fdBuf.getOff(fd))
 		return false;
+	if (fdBuf.getOff(fd) <= 3) {
+		return true;
+	}
+	if (fd < 3) {
+		fdBuf.set(fd, fd + 1);
+	}
 	return fdBuf.remove(fd);
 }
 
