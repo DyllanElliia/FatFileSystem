@@ -234,7 +234,7 @@ void User::echo(string data, string filePathName) {
 }
 
 void User::find(string dirName, string fileName) {
-  std::cout << "find1(" << dirName << ", " << fileName << ")\n";
+  // std::cout << "find1(" << dirName << ", " << fileName << ")\n";
   string current = fs.getDirName();
   string dir = this->fmtName(dirName);
   // std::cout << "current:" << current << "\tdir:" << dir << std::endl;
@@ -260,13 +260,13 @@ void User::find(string dirName, string fileName) {
   fs.close(fd);
   nameList nl = fs.getName();
   for (auto i : nl.nameL) {
-    std::cout << i.name << "\t" << i.type << "\t" << fileName << std::endl;
+    // std::cout << i.name << "\t" << i.type << "\t" << fileName << std::endl;
     if (i.name == fileName) {
-      std::cout << file << std::endl;
+      std::cout << this->fmtName(dir + "/" + fileName) << std::endl;
     }
     if (i.type == T_dir) {
       string f = dir + "/" + i.name;
-      std::cout << "find2(" << f << ", " << fileName << ")\n";
+      // std::cout << "find2(" << f << ", " << fileName << ")\n";
       find(f, fileName);
     }
   }
