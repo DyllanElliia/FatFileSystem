@@ -218,6 +218,12 @@ F_D FileSystem::open(const string PathName) {
 bool FileSystem::close(const F_D fd) {
 	if (fd == -1)
 		return false;
+	if (fdBuf.getOff(fd) <= 3) {
+		return true;
+	}
+	if (fd < 3) {
+		fdBuf.set(fd, fd + 1);
+	}
 	return fdBuf.remove(fd);
 }
 
