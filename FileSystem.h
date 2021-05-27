@@ -60,7 +60,7 @@ class FileSystem {
       string name;
       // bool operator<(l_data b) { return this->type > b.type ? true :
       // (this->name < b.name); }
-      bool operator<(l_data& b) const {
+      bool operator<(l_data b) const {
         if (type == b.type) return name < b.name;
         return type > b.type;
       }
