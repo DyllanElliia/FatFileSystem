@@ -4,6 +4,8 @@
 #include <iostream>
 #include <regex>
 
+#include "stat.h"
+
 FileSystem& User::getFs() { return this->fs; }
 
 string User::fmtName(string name) {
@@ -216,6 +218,7 @@ void User::echo(string data, string filePathName) {
     }
     fs.close(fd);
   }
+  fs.deleteFile(filePath);
   if (!fs.createFile(filePath)) {
     std::cout << "echo: Cannot create file " << filePath << std::endl;
     return;
@@ -233,17 +236,32 @@ void User::echo(string data, string filePathName) {
 void User::find(string dirName, string fileName) {
   string current = fs.getDirName();
   string dir = this->fmtName(dirName);
+  // std::cout << "current:" << current << "\tdir:" << dir << std::endl;
   string file = this->fmtName(fileName);
-  cd(dir);
+  F_D fd = fs.open(dir);
+  // std::cout << "fd=" << fd << std::endl;
+  if (fd != -1) {
+    Stat stat;
+    if (!fs.fstat(fd, &stat)) {
+      std::cout << "find: Cannot stat " << dirName << std::endl;
+    }
+    if (stat.type == T_dir) {
+      cd(dir);
+    } else {
+      return;
+    }
+  } else {
+    return;
+  }
   nameList nl = fs.getName();
   for (auto i : nl.nameL) {
-    if (i.name == file) {
-      string f = dir + "/" + file;
-      std::cout << f << std::endl;
+    // std::cout << i.name << "\t" << i.type << "\t" << fileName << std::endl;
+    if (i.name == fileName) {
+      std::cout << file << std::endl;
     }
     if (i.type == T_dir) {
-      string f = dir + "/" + file;
-      find(f, file);
+      string f = dir + "/" + i.name;
+      find(f, fileName);
     }
   }
   cd(current);
@@ -280,9 +298,10 @@ void User::tree(int level, int currentLevel, bool final) {
         std::cout << "│   ";
       }
     } else {
-      for (int i = 0; i < currentLevel; ++i) {
-        std::cout << "    ";
+      for (int i = 0; i < currentLevel - 1; ++i) {
+        std::cout << "│   ";
       }
+      std::cout << "    ";
     }
     if (i != --nl.nameL.end()) {
       std::cout << "├── " << i->name << std::endl;
