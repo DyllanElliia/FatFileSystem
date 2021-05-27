@@ -59,7 +59,7 @@ public:
 			S_type type;
 			string name;
 			// bool operator<(l_data b) { return this->type > b.type ? true : (this->name < b.name); }
-			bool operator<(l_data b) {
+			bool operator<(l_data& b) const {
 				if (type == b.type)
 					return name < b.name;
 				return type > b.type;
