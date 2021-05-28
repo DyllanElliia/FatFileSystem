@@ -7,7 +7,7 @@ class F_D_saver {
 private:
 	std::list<F_D> emptyBuf;
 	std::map<F_D, Offset> F_D_buf;
-	std::map<Offset, F_D> off_buf;
+	std::map<Offset, Offset> off_buf;
 
 public:
 	F_D_saver() {
