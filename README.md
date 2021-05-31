@@ -88,24 +88,24 @@ Just like \*nix, you can use the command "mkdir" to create a directory, and use 
 ```shell
 [/] # ls
 name	type	size
-a		dir		\
-b		dir		\
+a		dir	\
+b		dir	\
 a.t		file	14byte
 dyllan	file	14byte
 hw		file	12byte
-text	file	233byte
-text2	file	233byte
+text		file	233byte
+text2		file	233byte
 [/] # mkdir dir1
 [/] # ls
-name    type    size
-a       dir     \
-b       dir     \
-dir1    dir     \
-a.t     file    14byte
-dyllan  file    14byte
-hw      file    12byte
-text    file    233byte
-text2   file    233byte
+name	type	size
+a		dir	\
+b		dir	\
+dir1	dir	\
+a.t			file	14byte
+dyllan	file	14byte
+hw			file	12byte
+text	file	233byte
+text2	file	233byte
 ```
 
 You can use "echo" to print something to the screen, or use "echo [string] [filename]" to write the string to a file:
