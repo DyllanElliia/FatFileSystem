@@ -37,42 +37,204 @@ After make down, you can use
 
 to start the Filesystem:
 
-![image-20210528161040973](./images/image-20210528161040973.png)
+```powershell
+➜  FatFileSystem git:(main) ✗ ./main
+----------------System Data----------------
+System Name: FAT-Based System
+Producers' Name: Dyllan & Taka
+Vendor Name: UESTC
+Fat Space (64B/64B): 25/32
+Memory Space (64B/64B): 931/1024
+---------------System Running--------------
+Console init over
+Fat File System Booting...
+To get help about this system, please use "usage".
+[/] #
+```
 
 After seeing "[/] #", it means you can test the system.
 
 In this system, we've set several commands to control it. You can use the command "usage" to get help:
 
-![image-20210528161547286](./images/image-20210528161547286.png)
+```powershell
+[/] # usage
+COMMAND and SYNOPSIS:
+        ls: list all files and directories;
+                usage: ls
+        mkdir: create a directory;
+                usage: mkdir dirName
+        rmdir: remove a directory;
+                usage: rmdir dirName
+        rm: remove a file;
+                usage: rm fileName
+        cd: change current path;
+                usage: cd pathName
+        cat: concatenate and print file;
+                usage: cat fileName [another fileName]
+        echo: write arguments to the standard output or a file;
+                usage: echo string [fileName]
+        find: walk a file hierarchy;
+                usage: find path fileName
+        tree: list contents of directories in a tree-like format;
+                usage: tree [level(integer)]
+        pwd: return working directory name;
+                usage: pwd
+        exit: exit Fat File System.
+                usage: exit
+```
 
 Just like \*nix, you can use the command "mkdir" to create a directory, and use "ls" to list files and directories:
 
-![image-20210528162118385](./images/image-20210528162118385.png)
+```powershell
+[/] # ls
+name    type    size
+a       dir     \
+b       dir     \
+a.t     file    14byte
+dyllan  file    14byte
+hw      file    12byte
+text    file    233byte
+text2   file    233byte
+[/] # mkdir dir1
+[/] # ls
+name    type    size
+a       dir     \
+b       dir     \
+dir1    dir     \
+a.t     file    14byte
+dyllan  file    14byte
+hw      file    12byte
+text    file    233byte
+text2   file    233byte
+```
 
 You can use "echo" to print something to the screen, or use "echo [string] [filename]" to write the string to a file:
 
-![image-20210528162339330](./images/image-20210528162339330.png)
+```powershell
+[/] # echo "Hello World!"
+Hello World!
+[/] # echo "Hello C++!" hc
+[/] # ls
+name    type    size
+a       dir     \
+b       dir     \
+dir1    dir     \
+a.t     file    14byte
+dyllan  file    14byte
+hc      file    10byte
+hw      file    12byte
+text    file    233byte
+text2   file    233byte
+```
 
 If there is a file, the command "cat" can get its content and print it to the screen. Like "echo", you can use "cat [file1] [file2]" to write content from the first file to the second file:
 
-![image-20210528162728767](./images/image-20210528162728767.png)
+```powershell
+[/] # cat hc
+Hello C++!
+[/] # cat hc hc_new
+[/] # ls
+name    type    size
+a       dir     \
+b       dir     \
+dir1    dir     \
+a.t     file    14byte
+dyllan  file    14byte
+hc      file    10byte
+hc_new  file    10byte
+hw      file    12byte
+text    file    233byte
+text2   file    233byte
+[/] # cat hc_new
+Hello C++!
+```
 
 The command "tree [level]" can list all files and directories based on the level:
 
-![image-20210528163012088](./images/image-20210528163012088.png)
+```powershell
+[/] # echo FatSystem dir1/file
+[/] # mkdir dir1/dir2
+[/] # mkdir dir3
+[/] # mkdir dir3/dir2
+[/] # echo test dir3/file
+[/] # tree 2
+.
+├── a
+│   ├── aa
+│   ├── b
+│   └── c
+├── b
+│   └── a
+├── dir1
+│   ├── dir2
+│   └── file
+├── dir3
+│   ├── dir2
+│   └── file
+├── a.t
+├── dyllan
+├── hc
+├── hc_new
+├── hw
+├── text
+└── text2
+```
 
 If you want to find a file or a directory, you can use "find [path] [name]" like:
 
-![image-20210528163131820](./images/image-20210528163131820.png)
+```powershell
+[/] # find . file
+/dir1/file
+/dir3/file
+[/] # find . dir2
+/dir1/dir2
+/dir3/dir2
+[/] # find dir1 dir2
+/dir1/dir2
+```
 
 You can use "cd [path]" to change you path. You can get your current path from the begin of the line or use the command "pwd":
 
-![image-20210528163454865](./images/image-20210528163454865.png)
+```powershell
+[/] # cd dir1
+[/dir1] # pwd
+/dir1
+[/dir1] # cd /a
+[/a] # cd /
+[/] # pwd
+/
+```
 
 If you want to delete something, please use "rm [path]" for file and "rmdir [path]" for directory:
 
-![image-20210528163728368](./images/image-20210528163728368.png)
+```powershell
+[/] # rmdir /dir1/dir2
+[/] # rm /dir3/file
+[/] # tree 2
+.
+├── a
+│   ├── aa
+│   ├── b
+│   └── c
+├── b
+│   └── a
+├── dir1
+│   └── file
+├── dir3
+│   └── dir2
+├── a.t
+├── dyllan
+├── hc
+├── hc_new
+├── hw
+├── text
+└── text2
+```
 
 You can use "exit" to exit the system.
 
-![image-20210528163815073](./images/image-20210528163815073.png)
+```powershell
+[/] # exit
+----------------System Exit----------------
+```
+
