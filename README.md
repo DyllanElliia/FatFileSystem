@@ -10,20 +10,20 @@ A PC, Visual Studio Code, C++ 17, make
 
 Clone the repository:
 
-```bash
+```shell
 git clone https://github.com/DyllanElliia/FatFileSystem.git
 cd FatFileSystem
 ```
 
 You should create a directory named obj:
 
-```bash
+```shell
 mkdir obj
 ```
 
 Then make it:
 
-```bash
+```shell
 make
 ```
 
@@ -37,11 +37,11 @@ After make down, you can use
 
 to start the Filesystem:
 
-```powershell
+```shell
 ➜  FatFileSystem git:(main) ✗ ./main
 ----------------System Data----------------
 System Name: FAT-Based System
-Producers' Name: Dyllan & Taka
+Producers Name: Dyllan & Taka
 Vendor Name: UESTC
 Fat Space (64B/64B): 25/32
 Memory Space (64B/64B): 931/1024
@@ -56,7 +56,7 @@ After seeing "[/] #", it means you can test the system.
 
 In this system, we've set several commands to control it. You can use the command "usage" to get help:
 
-```powershell
+```shell
 [/] # usage
 COMMAND and SYNOPSIS:
         ls: list all files and directories;
@@ -85,7 +85,7 @@ COMMAND and SYNOPSIS:
 
 Just like \*nix, you can use the command "mkdir" to create a directory, and use "ls" to list files and directories:
 
-```powershell
+```shell
 [/] # ls
 name    type    size
 a       dir     \
@@ -110,7 +110,7 @@ text2   file    233byte
 
 You can use "echo" to print something to the screen, or use "echo [string] [filename]" to write the string to a file:
 
-```powershell
+```shell
 [/] # echo "Hello World!"
 Hello World!
 [/] # echo "Hello C++!" hc
@@ -129,7 +129,7 @@ text2   file    233byte
 
 If there is a file, the command "cat" can get its content and print it to the screen. Like "echo", you can use "cat [file1] [file2]" to write content from the first file to the second file:
 
-```powershell
+```shell
 [/] # cat hc
 Hello C++!
 [/] # cat hc hc_new
@@ -151,7 +151,7 @@ Hello C++!
 
 The command "tree [level]" can list all files and directories based on the level:
 
-```powershell
+```shell
 [/] # echo FatSystem dir1/file
 [/] # mkdir dir1/dir2
 [/] # mkdir dir3
@@ -182,7 +182,7 @@ The command "tree [level]" can list all files and directories based on the level
 
 If you want to find a file or a directory, you can use "find [path] [name]" like:
 
-```powershell
+```shell
 [/] # find . file
 /dir1/file
 /dir3/file
@@ -195,7 +195,7 @@ If you want to find a file or a directory, you can use "find [path] [name]" like
 
 You can use "cd [path]" to change you path. You can get your current path from the begin of the line or use the command "pwd":
 
-```powershell
+```shell
 [/] # cd dir1
 [/dir1] # pwd
 /dir1
@@ -207,7 +207,7 @@ You can use "cd [path]" to change you path. You can get your current path from t
 
 If you want to delete something, please use "rm [path]" for file and "rmdir [path]" for directory:
 
-```powershell
+```shell
 [/] # rmdir /dir1/dir2
 [/] # rm /dir3/file
 [/] # tree 2
@@ -233,7 +233,7 @@ If you want to delete something, please use "rm [path]" for file and "rmdir [pat
 
 You can use "exit" to exit the system.
 
-```powershell
+```shell
 [/] # exit
 ----------------System Exit----------------
 ```
