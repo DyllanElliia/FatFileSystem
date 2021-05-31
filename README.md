@@ -1,6 +1,6 @@
-# FatFileSystem
+# Fat-based System
 
-Simple simulator of Fat Filesystem based on C++
+Simple simulator of Fat-based system based on C++
 
 ## Development Environment
 
