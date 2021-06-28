@@ -88,24 +88,24 @@ Just like \*nix, you can use the command "mkdir" to create a directory, and use 
 ```shell
 [/] # ls
 name	type	size
-a		dir	\
-b		dir	\
-a.t		file	14byte
+a	dir	\
+b	dir	\
+a.t	file	14byte
 dyllan	file	14byte
-hw		file	12byte
-text		file	233byte
-text2		file	233byte
+hw	file	12byte
+text	file	233byte
+text2	file	233byte
 [/] # mkdir dir1
 [/] # ls
 name	type	size
-a		dir	\
-b		dir	\
-dir1		dir	\
-a.t		file	14byte
+a	dir	\
+b	dir	\
+dir1	dir	\
+a.t	file	14byte
 dyllan	file	14byte
-hw		file	12byte
-text		file	233byte
-text2		file	233byte
+hw	file	12byte
+text	file	233byte
+text2	file	233byte
 ```
 
 You can use "echo" to print something to the screen, or use "echo [string] [filename]" to write the string to a file:
@@ -116,15 +116,15 @@ Hello World!
 [/] # echo "Hello C++!" hc
 [/] # ls
 name	type	size
-a		dir	\
-b		dir	\
-dir1		dir	\
-a.t		file	14byte
+a	dir	\
+b	dir	\
+dir1	dir	\
+a.t	file	14byte
 dyllan	file	14byte
-hc		file	10byte
-hw		file	12byte
-text		file	233byte
-text2		file	233byte
+hc	file	10byte
+hw	file	12byte
+text	file	233byte
+text2	file	233byte
 ```
 
 If there is a file, the command "cat" can get its content and print it to the screen. Like "echo", you can use "cat [file1] [file2]" to write content from the first file to the second file:
@@ -135,16 +135,16 @@ Hello C++!
 [/] # cat hc hc_new
 [/] # ls
 name	type	size
-a		dir	\
-b		dir	\
-dir1		dir	\
-a.t		file	14byte
+a	dir	\
+b	dir	\
+dir1	dir	\
+a.t	file	14byte
 dyllan	file	14byte
-hc		file	10byte
+hc	file	10byte
 hc_new	file	10byte
-hw		file	12byte
-text		file	233byte
-text2		file	233byte
+hw	file	12byte
+text	file	233byte
+text2	file	233byte
 
 [/] # cat hc_new
 Hello C++!
