@@ -21,7 +21,6 @@ You should create a directory named obj:
 mkdir obj
 ```
 
-
 Then make it:
 
 ```shell
